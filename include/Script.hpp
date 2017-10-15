@@ -11,7 +11,6 @@
 #include <string>
 #include "curl/curl.h"
 #include "json.hpp"
-#include <iostream>
 #include <ctime>
 
 // The ScriptAccess class is for Script based Reddit api applications
