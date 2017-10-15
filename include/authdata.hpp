@@ -2,6 +2,7 @@
 #define AUTHDATA_HPP
 
 #include <string>
+#include <ctime>
 
 typedef struct authdat
 {
