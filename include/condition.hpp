@@ -2,7 +2,6 @@
 #define VUN_RETURNS_HPP
 
 #include <string>
-#include <iostream>
 
 // EStatus or _error_status is an enum that defines
 // errors needed for the library
