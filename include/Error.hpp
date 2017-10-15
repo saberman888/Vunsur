@@ -3,7 +3,6 @@
 
 #include "include/condition.hpp"
 #include "curl/curl.h"
-#include <iostream>
 
 void set_curl_handle_error( Status& s );
 void set_curl_global_error( Status& s );
