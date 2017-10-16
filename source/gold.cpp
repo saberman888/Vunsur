@@ -1,6 +1,6 @@
 #include "include/gold/gold.hpp"
 
-Status gild( AccessData* acd, std::string fullname )
+Status gild( AccessData* dat, std::string fullname )
 {
 	Status s;
 	int state;
@@ -54,7 +54,7 @@ Status gild( AccessData* acd, std::string fullname )
 			}
 		}
 	} else {
-		cset_curl_handle_error(s);
+		set_curl_handle_error(s);
 		return s;
 	}
 }
