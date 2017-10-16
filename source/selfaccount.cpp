@@ -818,7 +818,19 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					up->clickgadget = clickgadget;
 					up->compress = compress;
 					up->creddit_autorenew = creddit_autorenew;
-					up->default_comment_sort = default_comment_sort;
+					if( default_comment_sort == "confidence")
+						up->default_comment_sort = Conficence;
+					else if ( default_comment_sort == "old" )
+						up->default_comment_sort = Old;
+					if ( default_comment_sort == "top" )
+						up->default_comment_sort = Top;
+					else if ( default_comment_sort == "qa" )
+						up->default_comment_sort = QA;
+					if( default_comment_sort == "controversial" )
+						up->default_comment_sort = Controversial;
+					else if ( default_comment_sort == "new" )
+						up->default_comment_sort = New;
+					//up->default_comment_sort = default_comment_sort;
 					up->default_theme_sr = default_theme_sr;
 					up->domain_details = domain_details;
 					up->email_digests = email_digests;
