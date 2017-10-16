@@ -7,7 +7,7 @@
 #include "include/condition.hpp"
 #include "include/Error.hpp"
 
-// Gilds a thing, not finished
+// Gilds a thing
 Status gild( AccessData* dat, std::string fullname ); // not tested
 // Gives gold to a person
 Status give_gold( AccessData* dat, std::string username ); // not tested
