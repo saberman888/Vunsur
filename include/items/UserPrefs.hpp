@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "include/base/Types.hpp"
 
 
 typedef struct _prefs {
@@ -13,14 +14,15 @@ typedef struct _prefs {
 	bool compress;
 	std::vector< std::string > content_langs;
 	bool creddit_autorenew;
-	std::string default_comment_sort;
+	//std::string default_comment_sort;
+	SortType default_comment_sort;
 	std::string default_theme_sr; // this can be nullified
 	bool domain_details;
 	bool email_digests;
 	bool email_messages;
 	bool enable_default_themes;
 	std::string geopopular;
-	bool hide_abusive_comments;
+	//bool hide_abusive_comments;
 	bool hide_ads;
 	bool hide_downs;
 	bool hide_from_robots;
@@ -61,6 +63,8 @@ typedef struct _prefs {
 	bool threaded_modmail;
 	bool top_karma_subreddits;
 	bool use_global_defaults;
+	Region g;
+	
 	
 }UserPrefs;
 
