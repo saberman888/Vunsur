@@ -838,7 +838,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					
 					up->enable_default_themes = enable_default_themes;
 					up->geopopular = geopopular;
-					//up->hide_abusive_comments = hide_abusive_comments; -- no long abusive
+					//up->hide_abusive_comments = hide_abusive_comments; -- no longer exists 
 					up->hide_ads = hide_ads;
 					up->hide_downs = hide_downs;
 					up->hide_from_robots = hide_from_robots;
@@ -888,7 +888,9 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
+						#ifdef DEBUG
 						std::cout << e.what() << std::endl;
+						#endif
 						
 						std::string message = j.at("message");
 						int error = j.at("error");
@@ -901,9 +903,11 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 						api_error(s,error,message);
 					} catch( nlohmann::json::out_of_range& e ) {
 						
-						std::ofstream out("prefs.json");
-						out << json;
+						
+						#ifdef DEBUG
 						std::cout << e.what() << std::endl;
+						#endif
+						
 						unknown_error(s);
 						return s;
 					}
@@ -1277,7 +1281,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 			curl_global_cleanup();
 			
 			curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &state );
-			s.code = 200;
+			s.code = state;
 			
 			if( result != CURLE_OK ) {
 				set_curl_strerror(s,result);
