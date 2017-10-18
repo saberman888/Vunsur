@@ -187,14 +187,21 @@ Status ScriptAccess::getPrefs(UserPrefs* up) {
 	}
 }
 
+Status ScriptAccess::patchPrefs( UserPrefs* up ) {
+	if( this->isLoggedIn() ) {
+		return patch_prefs(this->acd, up);
+	} else {
+		Status s;
+		not_logged_in(s); return s;
+	}
+}
+
 Status ScriptAccess::getBlockedPrefs(std::vector< BasicUser*> *buv) {
 	if( this->isLoggedIn() ) {
 		return get_blocked_prefs(this->acd, buv);
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
@@ -204,10 +211,7 @@ Status ScriptAccess::getTrustedPrefs( std::vector< BasicUser* > *tuv ) {
 	if ( this->isLoggedIn() ) {
 		return get_trusted(this->acd, tuv);
 	} else {
-		
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
