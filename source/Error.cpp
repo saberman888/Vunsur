@@ -84,3 +84,9 @@ void bad_alloc_error( Status& s )
 	s.cstat = ERROR_BAD_ALLOCATION;
 	s.message = "Error: Bad allocation! ";
 }
+
+void not_logged_in( Status& s ) {
+	s.code = NULL;
+	s.cstat = ERROR_NOT_LOGGED_IN;
+	s.message = "Error: Not logged in";
+}
