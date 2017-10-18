@@ -29,6 +29,7 @@ Status get_friends( AccessData* dat, std::vector< BasicUser* > *f );
 Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv );
 Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt );
 Status get_prefs( AccessData* dat, UserPrefs* up );
+Status patch_prefs( AccessData* dat, UserPrefs* up ); // not yet implemented
 Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv );
 Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv );
 // get_messagingprefs does not work because it stops working when a trusted user exists
