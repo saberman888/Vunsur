@@ -761,7 +761,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					
 					bool enable_default_themes = j.at("enable_default_themes");
 					std::string geopopular = j.at("geopopular");
-					bool hide_abusive_comments = j.at("hide_abusive_comments");
+					//bool hide_abusive_comments = j.at("hide_abusive_comments"); -- no longer exists for some reason
 					bool hide_ads = j.at("hide_ads");
 					bool hide_downs = j.at("hide_downs");
 					bool hide_from_robots = j.at("hide_from_robots");
@@ -819,7 +819,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					up->compress = compress;
 					up->creddit_autorenew = creddit_autorenew;
 					if( default_comment_sort == "confidence")
-						up->default_comment_sort = Conficence;
+						up->default_comment_sort = Confidence;
 					else if ( default_comment_sort == "old" )
 						up->default_comment_sort = Old;
 					if ( default_comment_sort == "top" )
@@ -838,7 +838,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					
 					up->enable_default_themes = enable_default_themes;
 					up->geopopular = geopopular;
-					up->hide_abusive_comments = hide_abusive_comments;
+					//up->hide_abusive_comments = hide_abusive_comments; -- no long abusive
 					up->hide_ads = hide_ads;
 					up->hide_downs = hide_downs;
 					up->hide_from_robots = hide_from_robots;
@@ -888,10 +888,12 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
+						std::cout << e.what() << std::endl;
+						
 						std::string message = j.at("message");
 						int error = j.at("error");
 						
-						
+						e.what();
 						#ifdef DEBUG
 						std::cerr << message << std::endl; 
 						#endif
@@ -899,6 +901,9 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 						api_error(s,error,message);
 					} catch( nlohmann::json::out_of_range& e ) {
 						
+						std::ofstream out("prefs.json");
+						out << json;
+						std::cout << e.what() << std::endl;
 						unknown_error(s);
 						return s;
 					}
@@ -1220,4 +1225,81 @@ Status get_messagingprefs( AccessData* dat ) {
 		return s;
 	}
 	
+}
+
+Status patch_prefs( AccessData* dat, UserPrefs* up ) {
+	Status s;
+	int state;
+	CURL *handle;
+	CURLcode result;
+	std::string json;
+
+	
+	handle = curl_easy_init();
+	
+	if( handle ) {
+		if ( curl_global_init( CURL_GLOBAL_SSL ) != CURLE_OK ) {
+			set_curl_global_error(s);
+			return s;
+		} else {
+			struct curl_slist* header;
+			std::string authhead = "Authorization: ";
+			authhead += std::string(dat->token_type);
+			authhead += " ";
+			authhead += std::string(dat->token);
+			
+			header = curl_slist_append( header, authhead.c_str() );
+			
+			curl_easy_setopt( handle, CURLOPT_URL, "https://oauth.reddit.com/api/v1/me/prefs");
+			curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, "PATCH" );
+			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
+			
+			std::string inputjson;
+			nlohmann::json postjson = {
+				{"num_comments", up->num_comments }
+			};
+			//std::cout << std::setw(4) << postjson;
+			inputjson = postjson.dump();
+			std::cout << inputjson << std::endl;
+			
+			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, inputjson.c_str() );
+			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
+			curl_easy_setopt( handle, CURLOPT_USERAGENT, dat->userAgent.c_str() );
+			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
+			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
+			
+			#ifdef DEBUG
+			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
+			#endif
+			
+			result = curl_easy_perform(handle);
+			curl_easy_cleanup( handle );
+			curl_global_cleanup();
+			
+			curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &state );
+			s.code = 200;
+			
+			if( result != CURLE_OK ) {
+				set_curl_strerror(s,result);
+				return s;
+			} else {
+				
+				#ifdef DEBUG
+				std::cout << json << std::endl;
+				#endif
+				if( json.size() == 0)
+					json = "";
+				std::ofstream out( "patch.json" );
+				out << json;
+				
+				s.cstat = ERROR_NONE;
+				s.message = "";
+				return s;
+			}
+			
+		}
+	} else {
+		set_curl_handle_error(s);
+		return s;
+	}
 }
