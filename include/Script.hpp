@@ -41,6 +41,7 @@ class ScriptAccess {
 		// Gets the prefs settings for the user's account
 		Status getPrefs(UserPrefs *up);
 		// Returns a list of blocked users from your blocked prefs
+		Status patchPrefs( UserPrefs* up );
 		Status getBlockedPrefs(std::vector< BasicUser*> *buv);
 		// Gets the trusted preferences
 		Status getTrustedPrefs( std::vector< BasicUser* > *tuv );
