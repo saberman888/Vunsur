@@ -4,6 +4,7 @@
 #include "include/condition.hpp"
 #include "curl/curl.h"
 
+
 void set_curl_handle_error( Status& s );
 void set_curl_global_error( Status& s );
 void set_curl_strerror( Status& s, CURLcode result );
@@ -15,4 +16,5 @@ void array_error( Status& s );
 void not_an_array_error( Status& s, std::string array_name );
 void unknown_error( Status& s );
 void bad_alloc_error( Status& s );
+void not_logged_in(Status& s );
 #endif
