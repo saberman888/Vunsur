@@ -90,3 +90,9 @@ void not_logged_in( Status& s ) {
 	s.cstat = ERROR_NOT_LOGGED_IN;
 	s.message = "Error: Not logged in";
 }
+
+void no_modhash(Status& s) {
+	s.code = NULL;
+	s.cstat = ERROR_NO_MODHASH;
+	s.message = "Error: No modhash available";
+}
