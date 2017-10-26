@@ -115,13 +115,15 @@ Status get_self(AccessData* dat, UserAccount* person)
 						std::string message = j.at("message");
 						
 						api_error(st, status_code, message);
+						
 						return st;
 					} catch ( nlohmann::json::out_of_range& e ) {
-						unknown_error(st);
 						
 						#ifdef DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
+						
+						unknown_error(st);
 						return st;
 					}
 				}
@@ -235,6 +237,11 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv )
 				std::cout << jsondata << std::endl;
 				#endif
 				
+				#ifdef OUTJSON
+				std::ofstream out("get_karma_json.json");
+				out << json;
+				#endif
+				
 				auto j = nlohmann::json::parse(jsondata);
 				
 				try {
@@ -266,6 +273,11 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv )
 					}
 				} catch ( nlohmann::json::out_of_range& e ) { 
 					try {
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
+						
 						std::string message;
 						int error;
 							
@@ -276,6 +288,9 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv )
 							
 						return s;
 					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
 						unknown_error(s);
 						return s;
 					}
@@ -364,8 +379,11 @@ Status get_blocked_users(AccessData* dat)
 				#ifdef DEBUG
 				std::cout << jsondat << std::endl;
 				#endif
-				std::ofstream out("blocked.json");
+				
+				#ifdef OUTJSON
+				std::ofstream out("get_blocked_users_json.json");
 				out << jsondat;
+				#endif
 				
 				s.code = state;
 				s.cstat = ERROR_NONE;
@@ -457,9 +475,15 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f)
 				std::cout << jsondat << std::endl;
 				#endif
 				
+				#ifdef OUTJSON
+				std::ofstream out("get_friends_json.json");
+				out << json;
+				#endif
+				
 				#ifdef DEBUG
 				std::cout << jsondat.size() << std::endl;
 				#endif
+				
 				if( jsondat.size() == 0)
 				{
 					s.cstat = ERROR_NONE;
@@ -506,11 +530,21 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f)
 					}
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
+						
 						auto message = j.at("message");
 						
 						api_error(s,state,message);
 						return s;
 					} catch( nlohmann::json::out_of_range& e ){
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
+						
 						unknown_error(s);
 						
 						return s;
@@ -589,6 +623,11 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 				std::cout << json << std::endl;
 				#endif
 				
+				#ifdef OUTJSON
+				std::ofstream out("get_trophies_json.json");
+				out << json;
+				#endif
+				
 				if( json.size() == 0 ) {
 					s.cstat = ERROR_NONE;
 					s.message = "Error: No trophies";
@@ -662,12 +701,19 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
 						std::string msg = j.at("message");
 
 						api_error(s, state, msg);
 						
 						return s;
 					} catch( nlohmann::json::out_of_range& e ) {
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
 						
 						unknown_error(s);
 						return s;
@@ -736,6 +782,11 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				#ifdef DEBUG
 				std::cout << json << std::endl;
 				std::cout << state << std::endl;
+				#endif
+				
+				#ifdef OUTJSON
+				std::ofstream out("get_prefs_json.json");
+				out << json;
 				#endif
 				
 				auto j = nlohmann::json::parse(json);
@@ -906,7 +957,6 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 						std::string message = j.at("message");
 						int error = j.at("error");
 						
-						e.what();
 						#ifdef DEBUG
 						std::cerr << message << std::endl; 
 						#endif
@@ -947,13 +997,8 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 	if( handle ) {
 		CURLcode result = curl_global_init(CURL_GLOBAL_SSL);
 		if( result != CURLE_OK ) {
-			#ifdef DEBUG
-			std::cerr << "Error: Failed to initialize CURL GLOBAL" << std::endl;
-			#endif
 			
-			s.code = NULL;
-			s.cstat = ERROR_CURL_GLOBAL_FAILED_INIT;
-			s.message = "Error: Failed to initialize CURL GLOBAL";
+			set_curl_global_error(s);
 			return s;
 		} else {
 			struct curl_slist* header;
@@ -992,6 +1037,10 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 				std::cout << json << std::endl;
 				#endif
 			
+				#ifdef OUTJSON
+				std::ofstream out("get_blocked_perfs_json.json");
+				out << json;
+				#endif
 				
 				//std::ofstream out("blocked_prefs.json");
 				//out << json;
@@ -1027,6 +1076,11 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 					}
 				} catch (nlohmann::json::out_of_range& e){
 					try {
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
+						
 						std::string message = j.at("message");
 						int error = j.at("error");
 						
@@ -1037,6 +1091,10 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 						api_error(s,error,message);
 						return s;
 					} catch ( nlohmann::json::out_of_range& e ) {
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
 						
 						unknown_error(s);
 						return s;
@@ -1050,13 +1108,7 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 			}
 		}
 	} else {
-		#ifdef DEBUG
-		std::cerr << "Error: Failed to initialize CURL * handle";
-		#endif
-		
-		s.code = NULL;
-		s.cstat = ERROR_CURL_HANDLE_FAILED_INIT;
-		s.message = "Error: Failed to initialize CURL * handle";
+		set_curl_handle_error(s);
 		return s;
 	}
 	
@@ -1114,8 +1166,10 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 				std::cerr << json << std::endl;
 				#endif
 				
-				//std::ofstream out("trusted_prefs.json");
-				//out << json;
+				#ifdef OUTJSON
+				std::ofstream out("trusted_prefs.json");
+				out << json;
+				#endif
 				
 				auto j = nlohmann::json::parse(json);
 				
@@ -1148,6 +1202,10 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 				} catch ( nlohmann::json::out_of_range& e) {
 					try {
 						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
+						
 						std::string message = j.at("message");
 						
 						#ifdef DEBUG
@@ -1161,6 +1219,11 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 						return s;
 						
 					} catch ( nlohmann::json::out_of_range& e ) {
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
+						
 						unknown_error(s);
 						
 						return s;
@@ -1226,8 +1289,11 @@ Status get_messagingprefs( AccessData* dat ) {
 				#ifdef DEBUG
 				std::cout << json << std::endl;
 				#endif
+				
+				#ifdef OUTJSON
 				std::ofstream out("messaging.json");
 				out << json;
+				#endif
 				
 				
 				s.cstat = ERROR_NONE;
@@ -1251,14 +1317,12 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 
 	
 	handle = curl_easy_init();
-	std::cout << "initialized" << std::endl;
 	
 	if( handle ) {
 		if ( curl_global_init( CURL_GLOBAL_SSL ) != CURLE_OK ) {
 			set_curl_global_error(s);
 			return s;
 		} else {
-			std::cout << "globalized" << std::endl;
 			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
@@ -1266,11 +1330,11 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 			
 			header = curl_slist_append( header, authhead.c_str() );
 			header = curl_slist_append( header, "Content-Type: application/json" );
-			std::cout << "opt" << std::endl;
+
 			curl_easy_setopt( handle, CURLOPT_URL, "https://oauth.reddit.com/api/v1/me/prefs");
 			curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, "PATCH" );
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
-			std::cout << "json" << std::endl;
+
 			
 			std::string default_comment_sort;
 			switch( up->default_comment_sort ) {
@@ -1297,7 +1361,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				//{ "g", str_tok(up->g) },
 				{ "hide_ads", up->hide_ads }
 			};
-			std::cout << std::setw(4) << postjson;
+			//std::cout << std::setw(4) << postjson;
 			
 			inputjson = postjson.dump();
 			//inputjson = "{ \"num_comments\" : 500 }";
@@ -1329,18 +1393,30 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				#ifdef DEBUG
 				std::cout << json << std::endl;
 				#endif
+				
+				#ifdef OUTJSON
+				std::ofstream out("patch_prefs_json.json");
+				out << json;
+				#endif
+				
 				if( json.size() == 0)
 					json = "";
-				std::ofstream out( "patch.json" );
-				out << json;
+					
 				auto j = nlohmann::json::parse(json);
 				try {
+					#ifdef DEBUG
+					std::cout << e.what() << std::endl;
+					#endif
+					
 					std::string message = j.at("message");
 					int error = j.at("error");
 					
 					api_error(s, error, message);
 					return s;
 				} catch ( nlohmann::json::out_of_range& e ) {
+					#ifdef DEBUG
+					std::cout << e.what() << std::endl;
+					#endif
 					unknown_error(s);
 					return s;
 				}
