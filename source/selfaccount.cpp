@@ -70,12 +70,16 @@ Status get_self(AccessData* dat, UserAccount* person)
 				bool over_18;
 				bool is_employee;
 				bool is_sponsor;
-				bool is_friend;
+				//bool is_friend;
 				
 				#ifdef DEBUG
 				std::cout << returndata << std::endl;
 				#endif
 				
+				#ifdef OUTJSON
+				std::ofstream out("getme_json.json");
+				out << returndata;
+				#endif
 				auto j = nlohmann::json::parse(returndata);
 
 				
@@ -102,15 +106,22 @@ Status get_self(AccessData* dat, UserAccount* person)
 					in_beta = j.at("in_beta");
 					is_mod = j.at("is_mod");
 					over_18 = j.at("over_18");
-					is_friend = j.at("is_friend");
+					//is_friend = j.at("is_friend");
 				} catch( nlohmann::json::out_of_range& e ) {
 					try {
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
 						std::string message = j.at("message");
 						
 						api_error(st, status_code, message);
 						return st;
 					} catch ( nlohmann::json::out_of_range& e ) {
 						unknown_error(st);
+						
+						#ifdef DEBUG
+						std::cout << e.what() << std::endl;
+						#endif
 						return st;
 					}
 				}
@@ -150,7 +161,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 				person->is_gold = is_gold;
 				person->is_mod = is_mod;
 				person->over_18 = over_18;
-				person->is_friend = is_friend;
+				//person->is_friend = is_friend;
 				person->created = created;
 				person->created_utc = created_utc;
 				
@@ -1230,7 +1241,7 @@ Status get_messagingprefs( AccessData* dat ) {
 	}
 	
 }
-
+// not finished
 Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 	Status s;
 	int state;
@@ -1240,33 +1251,60 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 
 	
 	handle = curl_easy_init();
+	std::cout << "initialized" << std::endl;
 	
 	if( handle ) {
 		if ( curl_global_init( CURL_GLOBAL_SSL ) != CURLE_OK ) {
 			set_curl_global_error(s);
 			return s;
 		} else {
-			struct curl_slist* header;
+			std::cout << "globalized" << std::endl;
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
-			authhead += " ";
 			authhead += std::string(dat->token);
 			
 			header = curl_slist_append( header, authhead.c_str() );
-			
+			header = curl_slist_append( header, "Content-Type: application/json" );
+			std::cout << "opt" << std::endl;
 			curl_easy_setopt( handle, CURLOPT_URL, "https://oauth.reddit.com/api/v1/me/prefs");
 			curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, "PATCH" );
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
+			std::cout << "json" << std::endl;
 			
+			std::string default_comment_sort;
+			switch( up->default_comment_sort ) {
+				case Confidence: default_comment_sort = "confidence"; break;
+				case Old: default_comment_sort = "old"; break;
+				case Top: default_comment_sort = "top"; break;
+				case QA: default_comment_sort = "qa"; break;
+				case Controversial: default_comment_sort = "controversial"; break;
+				case New: default_comment_sort = "new"; break;
+				default: default_comment_sort = "confidence"; break;
+			}
 			std::string inputjson;
 			nlohmann::json postjson = {
-				{"num_comments", up->num_comments }
+				{ "allow_clicktracking", up->allow_clicktracking },
+				{ "num_comments", up->num_comments },
+				{ "beta", up->beta },
+				{ "clickgadget", up->clickgadget },
+				{ "compress", up->clickgadget },
+				{ "creddit_autorenew", up->creddit_autorenew },
+				{ "default_comment_sort", default_comment_sort },
+				{ "domain_details", up->domain_details },
+				{ "email_digests", up->email_digests },
+				{ "enable_default_themes", up->enable_default_themes },
+				//{ "g", str_tok(up->g) },
+				{ "hide_ads", up->hide_ads }
 			};
-			//std::cout << std::setw(4) << postjson;
+			std::cout << std::setw(4) << postjson;
+			
 			inputjson = postjson.dump();
-			std::cout << inputjson << std::endl;
+			//inputjson = "{ \"num_comments\" : 500 }";
+			//std::cout << inputjson << std::endl;
 			
 			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, inputjson.c_str() );
+			//curl_easy_setopt( handle, CURLOPT_RETURNTRANSFER, 1 );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			curl_easy_setopt( handle, CURLOPT_USERAGENT, dat->userAgent.c_str() );
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
@@ -1295,9 +1333,17 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 					json = "";
 				std::ofstream out( "patch.json" );
 				out << json;
-				
-				s.cstat = ERROR_NONE;
-				s.message = "";
+				auto j = nlohmann::json::parse(json);
+				try {
+					std::string message = j.at("message");
+					int error = j.at("error");
+					
+					api_error(s, error, message);
+					return s;
+				} catch ( nlohmann::json::out_of_range& e ) {
+					unknown_error(s);
+					return s;
+				}
 				return s;
 			}
 			
