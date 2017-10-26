@@ -17,4 +17,5 @@ void not_an_array_error( Status& s, std::string array_name );
 void unknown_error( Status& s );
 void bad_alloc_error( Status& s );
 void not_logged_in(Status& s );
+void no_modhash(Status& s );
 #endif
