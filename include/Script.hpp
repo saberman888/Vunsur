@@ -7,6 +7,7 @@
 #include "include/account/user.hpp"
 #include "include/gold/gold.hpp"
 #include "include/Info.hpp"
+#include "include/flair/Flair.hpp"
 
 #include <string>
 #include "curl/curl.h"
@@ -54,9 +55,13 @@ class ScriptAccess {
 		// getUserAbout get's user information about a user
 		Status getUserAbout( std::string username, UserAccount* ua );
 		
-		// ********* GOLD FUNCTIONS *******
+		// ********* GOLD FUNCTIONS **********
 		// This function gives gold a user
 		Status giveGold( std::string username );
+		
+		// ********* FLAIR FUNCTIONS *********
+		Status ClearFlairTemplates( std::string subreddit, FlairType ft);
+		
 		
 		friend Status authenticate( ScriptAccess* src, AccessData* acs );
 		
@@ -81,6 +86,9 @@ class ScriptAccess {
 		// and it will determine your functionality access accross
 		// this API
 		bool loginAccess;
+		// A boolean for modhash access
+		bool modhash_access;
+		bool ModhashExists() { return this->modhash_access; }
 		// The acd variable holds access_token, token type, scope and expire time
 		AccessData* acd;
 
