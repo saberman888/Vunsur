@@ -46,7 +46,7 @@ ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const cha
 		throw NoUserAgent();
 	}
 	this->userAgent = userAgent;
-	
+	this->modhash_access = false;
 	// Done
 	
 }
@@ -95,6 +95,7 @@ Status ScriptAccess::getMe()
 		
 		// Before returning lets get the mod hash
 		this->acd->modhash = this->acc->modhash;
+		this->modhash_access = true;
 		return me;
 	} else {
 		// If the user is not logged in then set code to NULL
@@ -239,6 +240,20 @@ Status ScriptAccess::giveGold( std::string username ) {
 		s.cstat = ERROR_NOT_LOGGED_IN;
 		s.message = "Error: Not logged in";
 		return s;
+	}
+}
+
+Status ScriptAccess::ClearFlairTemplates( std::string subreddit, FlairType ft) 
+{
+	Status s;
+	if( this->isLoggedIn() == true  && this->ModhashExists() == true ) {
+		return clear_flair_templates(this->acd, subreddit, ft);
+	} else {
+		if( this->isLoggedIn() == false )
+			not_logged_in(s); return s;
+			
+		if( this->ModhashExists() == false )
+			no_modhash(s); return s;
 	}
 }
 
