@@ -3,6 +3,7 @@
 
 #include <string>
 
+
 // EStatus or _error_status is an enum that defines
 // errors needed for the library
 typedef enum _error_status
@@ -15,7 +16,8 @@ typedef enum _error_status
 	ERROR_UNSUPPORTED_GRANT_TYPE,
 	ERROR_UNKNOWN_ERROR,
 	ERROR_JSONERROR,
-	ERROR_BAD_ALLOCATION
+	ERROR_BAD_ALLOCATION,
+	ERROR_NO_MODHASH
 }EStatus;
 // Status or _ret holds operation information like whether or not
 // failure occured and it's specifics and etc
