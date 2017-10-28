@@ -4,7 +4,7 @@
 void set_curl_handle_error( Status& s )
 {
 	#ifdef DEBUG
-	std::cout << "Error: Failed to initialize CURL *handle " << std::endl;
+	std::cerr << "Error: Failed to initialize CURL *handle " << std::endl;
 	#endif
 	
 	s.code = NULL;
@@ -16,7 +16,7 @@ void set_curl_handle_error( Status& s )
 void set_curl_global_error( Status& s )
 {
 	#ifdef DEBUG
-	std::cout << "Error: Failed to initialize CURL GLOBAL " << std::endl;
+	std::cerr << "Error: Failed to initialize CURL GLOBAL " << std::endl;
 	#endif
 	
 	s.code = NULL;
@@ -27,7 +27,7 @@ void set_curl_global_error( Status& s )
 void set_curl_strerror( Status& s, CURLcode result )
 {
 	#ifdef DEBUG
-	std::cout << curl_easy_strerror(result) << std::endl;
+	std::cerr << curl_easy_strerror(result) << std::endl;
 	#endif
 	
 	s.cstat = ERROR_CURL_STRERROR;
@@ -36,6 +36,10 @@ void set_curl_strerror( Status& s, CURLcode result )
 
 void api_error(Status& s, int code, std::string message)
 {
+	#ifdef DEBUG
+	std::cerr << message << std::endl;
+	#endif
+	
 	s.cstat = ERROR_NONE;
 	s.code = code;
 	s.message = message;
@@ -44,7 +48,7 @@ void api_error(Status& s, int code, std::string message)
 void array_error( Status& s )
 {
 	#ifdef DEBUG
-	std::cout << "Error: Failed to parse json children " << std::endl;
+	std::cerr << "Error: Failed to parse json children " << std::endl;
 	#endif
 	
 	s.cstat = ERROR_JSONERROR;
@@ -54,7 +58,7 @@ void array_error( Status& s )
 void not_an_array_error( Status& s, std::string array_name )
 {
 	#ifdef DEBUG
-	std::cout << "Error: " << array_name << " is not an array " << std::endl;
+	std::cerr << "Error: " << array_name << " is not an array " << std::endl;
 	#endif
 	
 	std::string es = "Error: ";
@@ -68,7 +72,7 @@ void not_an_array_error( Status& s, std::string array_name )
 void unknown_error( Status& s )
 {
 	#ifdef DEBUG
-	std::cout << "Error: Unknown error " << std::endl;
+	std::cerr << "Error: Unknown error " << std::endl;
 	#endif
 	
 	s.cstat = ERROR_UNKNOWN_ERROR;
@@ -78,7 +82,7 @@ void unknown_error( Status& s )
 void bad_alloc_error( Status& s )
 {
 	#ifdef DEBUG
-	std::cout << "Error: Bad allocation! " << std::endl;
+	std::cerr << "Error: Bad allocation! " << std::endl;
 	#endif
 	
 	s.cstat = ERROR_BAD_ALLOCATION;
@@ -86,13 +90,29 @@ void bad_alloc_error( Status& s )
 }
 
 void not_logged_in( Status& s ) {
+	
+	#ifdef DEBUG
+	std::cerr << "Error: Not logged in" << std::endl;
+	#endif
 	s.code = NULL;
 	s.cstat = ERROR_NOT_LOGGED_IN;
 	s.message = "Error: Not logged in";
 }
 
 void no_modhash(Status& s) {
+	#ifdef DEBUG
+	std::cerr << "Error: No modhash available" << std::endl;
+	#endif
+	
 	s.code = NULL;
 	s.cstat = ERROR_NO_MODHASH;
 	s.message = "Error: No modhash available";
+}
+
+void json_error(Status& s, std::string message) {
+	#ifdef DEBUG
+	std::cerr << message << std::endl;
+	#endif
+	s.cstat = ERROR_JSONERROR;
+	s.message = message;
 }
