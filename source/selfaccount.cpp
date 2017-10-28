@@ -48,29 +48,6 @@ Status get_self(AccessData* dat, UserAccount* person)
 				
 				return st;
 			} else {
-				int commentkarma;
-				int inbox_count;
-				int link_karma;
-				int gold_creddits;
-				
-				long created;
-				long created_utc;
-				
-				std::string modhash;
-				std::string name;
-				std::string id;
-				
-				bool has_mail;
-				bool has_mod_mail;
-				bool has_verified_email;
-				bool is_gold;
-				bool is_mod;
-				bool in_beta;
-				bool is_suspended;
-				bool over_18;
-				bool is_employee;
-				bool is_sponsor;
-				//bool is_friend;
 				
 				#ifdef DEBUG
 				std::cout << returndata << std::endl;
@@ -80,38 +57,281 @@ Status get_self(AccessData* dat, UserAccount* person)
 				std::ofstream out("getme_json.json");
 				out << returndata;
 				#endif
-				auto j = nlohmann::json::parse(returndata);
+				
+				auto js = nlohmann::json::parse(returndata);
 
+				UserAccount* usr = new UserAccount;
+				if(!usr) {
+					bad_alloc_error(st);
+					//delete usr;
+					return st;
+				}
 				
 				try {
-					commentkarma = j.at("comment_karma");
-					link_karma = j.at("link_karma");
-
-					created = j.at("created");
-					created_utc = j.at("created_utc");
-	
-					name = j.at("name");
-					id = j.at("id");
-
-					inbox_count = j.at("inbox_count");
-	
-					has_mail = j.at("has_mail");
-					has_mod_mail = j.at("has_mod_mail");
-					has_verified_email = j.at("has_verified_email");
-
-					is_sponsor = j.at("is_sponsor");
-					is_employee = j.at("is_employee");
-					is_suspended = j.at("is_suspended");
-					is_gold = j.at("is_gold");
-					in_beta = j.at("in_beta");
-					is_mod = j.at("is_mod");
-					over_18 = j.at("over_18");
-					//is_friend = j.at("is_friend");
+					usr->comment_karma = js.at("comment_karma");
+					usr->created = js.at("created");
+					usr->created_utc = js.at("created_utc");
+					
+					// begin features
+					auto j;
+					try {
+						j = js.at("features");
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: features does not exist"); return st;
+					}
+					
+					usr->activity_service_read = j.at("activity_service_read");
+					usr->activity_service_write = j.at("activity_service_write");
+					usr->adblock_test = j.at("adblock_test");
+					usr->ads_auction = j.at("ads_auction");
+					usr->ads_auto_extend = j.at("ads_auto_extend");
+					usr->ads_auto_refund = j.at("ads_auto_refund");
+					usr->adserver_reporting = j.at("adserver_reporting");
+					usr->adzerk_do_not_track = j.at("adzerk_do_not_track");
+					usr->adzerk_reporting_2 = j.at("adzerk_reporting_2");
+					
+					usr->chat = j.at("chat");
+					
+					usr->default_srs_holdout = new Holdout;
+					if(!usr->default_srs_holdout) {
+						bad_alloc_error(st); return st;
+					}
+					
+					auto dsh;
+					try {
+						dsh = j.at("default_srs_holdout");
+						
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: default_srs_holdout does not exist");
+						return st;
+					}
+					
+					usr->default_srs_holdout->experiment_id = dsh.at("experiment_id");
+					usr->default_srs_holdout->owner = dsh.at("owner");
+					usr->default_srs_holdout->variant = dsh.at("variant");
+					
+					usr->do_not_track = j.at("do_not_track");
+					usr->eu_cookie_policy = j.at("eu_cookie_policy");
+					usr->expando_events = j.at("expando_events");
+					usr->force_https = j.at("force_https");
+					usr->geopopular = j.at("geopopular");
+					
+					usr->geopopular_gb_holdout = new Holdout;
+					if(!usr->geopopular_gb_holdout) {
+						bad_alloc_error(st); return st;
+					}
+					
+					try {
+						dsh = j.at("geopopular_gb_holdout");
+						
+					} catch ( nlohmann::json::out_of_range& e ) {
+						
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: geopopular_gb_holdout does not exist"); return st;
+					}
+					
+					usr->geopopular_gb_holdout->experiment_id = dsh.at("experiment_id");
+					usr->geopopular_gb_holdout->owner = dsh.at("owner");
+					usr->geopopular_gb_holdout->variant = dsh.at("variant");
+					
+					try {
+						dsh = j.at("geopopular_ie_holdout");
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: geopopular_ie_holdout does not exist"); return st;
+					}
+					
+					usr->geopopular_ie_holdout->experiment_id = dsh.at("experiment_id");
+					usr->geopopular_ie_holdout->owner = dsh.at("owner");
+					usr->geopopular_ie_holdout->variant = dsh.at("variant");
+					
+					try {
+						dsh = j.at("geopopular_in_holdout");
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: geopopular_in_holdout does not exist"); return st;
+					}
+					
+					usr->geopopular_in_holdout->experiment_id = dsh.at("experiment_id");
+					usr->geopopular_in_holdout->owner = dsh.at("owner");
+					usr->geopopular_in_holdout->variant = dsh.at("variant");
+					
+					try {
+						dsh = j.at("geopopular_tw_holdout");
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: geopopular_tw_holdout does not exist"); return st;
+					}
+					
+					usr->geopopular_tw_holdout->experiment_id = dsh.at("experiment_id");
+					usr->geopopular_tw_holdout->owner = dsh.at("owner");
+					usr->geopopular_tw_holdout->variant = dsh.at("variant");
+					
+					usr->give_hsts_grants = j.at("give_hsts_grants");
+					usr->https_redirect = j.at("https_redirect");
+					usr->inbox_count = j.at("inbox_count");
+					usr->interest_targeting = j.at("interesting_target");
+					usr->legacy_search_prefs = j.at("legacy_search_prefs");
+					usr->listing_service_rampup = j.at("listing_service_rampup");
+					usr->live_happening_now = j.at("live_happening_now");
+					usr->live_orangereds = j.at("live_orangereds");
+					usr->loadtest_sendbird_me = j.at("loadtest_sendbird_me");
+					usr->moat_tracking = j.at("moat_tracking");
+					usr->mobile_native_banner = j.at("mobile_native_banner");
+					usr->mobile_web_targeting = j.at("mobile_web_targeting");
+					
+					try {
+						dsh = j.at("mweb_xpromo_ad_feed_ios");
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: mweb_xpromo_ad_feed_ios does not exist"); return st;
+					}
+					
+					usr->mweb_xpromo_ad_feed_ios->experiment_id = dsh.at("experiment_id");
+					usr->mweb_xpromo_ad_feed_ios->owner = dsh.at("owner");
+					usr->mweb_xpromo_ad_feed_ios->variant = dsh.at("variant");
+					
+					usr->mweb_xpromo_interstitial_comments_android = j.at("mweb_xpromo_interstitial_comments_android");
+					usr->mweb_xpromo_interstitial_comments_ios = j.at("mweb_xpromo_interstitial_comments_ios");
+					
+					usr->mweb_xpromo_modal_listing_click_daily_dismissible_android = j.at("mweb_xpromo_modal_listing_click_daily_dismissible_android");
+					usr->mweb_xpromo_modal_listing_click_daily_dismissible_ios = j.at("mweb_xpromo_modal_listing_click_daily_dismissible_ios");
+					
+					usr->new_loggedin_cache_policy = j.at("new_loggedin_cache_policy");
+					usr->new_overview = j.at("new_overview");
+					usr->new_report_dialog = j.at("new_report_dialog");
+					usr->new_report_flow = j.at("new_report_flow");
+					usr->orangereds_as_emails = j.at("orangereds_as_emails");
+					usr->outbound_clicktracking = j.at("outbound_clicktracking");
+					usr->pause_ads = j.at("pause_ads");
+					usr->personalization_prefs = j.at("personalization_prefs");
+					usr->post_embed = j.at("post_embed");
+					usr->post_to_profile_beta = j.at("post_to_profile_beta");
+					usr->programmatic_ads = j.at("programmatic_ads");
+					usr->screenview_events = j.at("screenview_events");
+					usr->scroll_events = j.at("scroll_events");
+					usr->search_dark_traffic = j.at("search_dark_traffic");
+					
+					try {
+						dsh = j.at("search_public_traffic");
+						
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: search_public_traffic does not exist"); return st;
+					}
+					
+					usr->search_public_traffic->experiment_id = j.at("experiment_id");
+					usr->search_public_traffic->owner = j.at("owner");
+					usr->search_public_traffic->variant = j.at("variant");
+					
+					usr->show_amp_link = j.at("show_amp_link");
+					usr->show_recommended_link = j.at("show_recommended_link");
+					usr->show_user_sr_name = j.at("show_user_sr_name");
+					usr->subreddit_rules = j.at("subreddit_rules");
+					usr->upgrade_cookies = j.at("upgrade_cookies");
+					usr->users_listing = j.at("users_listing");
+					usr->whitelisted_pms = j.at("whitelisted_pms");
+					// end features
+					
+					usr->gold_creddits = js.at("gold_creddits");
+					
+					try {
+						if( js.at("gold_expirations").is_null() ) {
+							usr->gold_expiration = NULL;
+						} else {
+							usr->gold_expiration = js.at("gold_expirations");
+						}
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: gold_expirations does not exist"); return st;
+					}
+					
+					usr->has_mail = js.at("has_mail");
+					usr->has_mod_mail = js.at("has_mod_mail");
+					usr->has_subscribed = js.at("has_subscribed");
+					usr->has_verified_email = js.at("has_verified_email");
+					usr->hide_from_robots = js.at("hide_from_robots");
+					usr->id = js.at("id");
+					usr->in_beta = js.at("in_beta");
+					usr->inbox_count = js.at("inbox_count");
+					usr->is_employee = js.at("is_employee");
+					usr->is_mod = js.at("is_mod");
+					usr->is_sponsor = js.at("is_sponsor");
+					usr->is_suspended = js.at("is_suspended");
+					usr->link_karma = js.at("link_karma");
+					usr->name = name js.at("name");
+					usr->new_modmail_exists = js.at("new_modmail_exists");
+					usr->oauth_client_id = js.at("oauth_client_id");
+					usr->over_18 = js.at("over_18");
+					usr->pref_geopopular = js.at("pref_geopopular");
+					usr->pref_no_profanity = js.at("pref_no_profanity");
+					usr->pref_show_snoovatar = js.at("pref_show_snoovatar");
+					usr->pref_top_karma_subreddits = js.at("pref_top_karma_subreddits");
+					
+					auto sub;
+					try {
+						sub = j.at("subreddit");
+					} catch( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: subreddit does not exist"); return st;
+					}
+					
+					long suspension_expiration_utc;
+					try {
+						if( js.at("suspension_expiration_utc").is_null() ) {
+							suspension_expiration_utc = 0;
+						} else {
+							suspension_expiration_utc = js.at("suspension_expiration_utc");
+						}
+					} catch ( nlohmann::json::out_of_range& e ) {
+						#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+						#endif
+						
+						json_error(st, "Error: suspension_expiration_utc does not exist"); return st;
+					}
+					usr->suspension_expiration_utc = suspension_expiration_utc;
+					usr->verified = js.at("verified");
+					
+					
 				} catch( nlohmann::json::out_of_range& e ) {
 					try {
 						#ifdef DEBUG
-						std::cout << e.what() << std::endl;
+						std::cerr << e.what() << std::endl;
 						#endif
+						
 						std::string message = j.at("message");
 						
 						api_error(st, status_code, message);
@@ -120,7 +340,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					} catch ( nlohmann::json::out_of_range& e ) {
 						
 						#ifdef DEBUG
-						std::cout << e.what() << std::endl;
+						std::cerr << e.what() << std::endl;
 						#endif
 						
 						unknown_error(st);
@@ -128,44 +348,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					}
 				}
 				
-				try {
-					modhash = j.at("modhash");
-				} catch(nlohmann::json::type_error& e ){
-					modhash = "0";
-				}
-				
-				//person = new Self;
-				person->CommentKarma = commentkarma;
-				person->inbox_count = inbox_count;
-				person->LinkKarma = link_karma;
-				// Modhash conversion
-				if(modhash != "0")
-				{
-					char* cmodhash;
-					std::strcpy(cmodhash, modhash.c_str());
-					person->modhash = cmodhash;
-				} else {
-					person->modhash = nullptr;
-				}
-				//end
-				person->name = name;
-				person->user_id = id;
-				
-				
-				person->has_mail = has_mail;
-				person->has_mod_mail = has_mod_mail;
-				person->has_verified_email = has_verified_email;
-				
-				person->is_sponsor = is_sponsor;
-				person->is_suspended = is_suspended;
-				person->is_employee = is_employee;
-				person->in_beta = in_beta;
-				person->is_gold = is_gold;
-				person->is_mod = is_mod;
-				person->over_18 = over_18;
-				//person->is_friend = is_friend;
-				person->created = created;
-				person->created_utc = created_utc;
+
 				
 				st.code = status_code;
 				st.cstat = ERROR_NONE;
@@ -239,7 +422,7 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv )
 				
 				#ifdef OUTJSON
 				std::ofstream out("get_karma_json.json");
-				out << json;
+				out << jsondata;
 				#endif
 				
 				auto j = nlohmann::json::parse(jsondata);
@@ -477,7 +660,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f)
 				
 				#ifdef OUTJSON
 				std::ofstream out("get_friends_json.json");
-				out << json;
+				out << jsondat;
 				#endif
 				
 				#ifdef DEBUG
@@ -1346,6 +1529,13 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				case New: default_comment_sort = "new"; break;
 				default: default_comment_sort = "confidence"; break;
 			}
+			
+			std::string gv;
+			switch(up->g) {
+				case GLOBAL: gv = str_tok(GLOBAL); break; case US: gv = str_tok(US); break; case AU: gv = str_tok(AU); break;
+				case BG: gv = str_tok(BG); break; case CA: gv = str_tok(CA); break; case CL: gv = str_tok(CL); break;
+				case CO: gv = str_tok(CO); break; case HR: gv = str_tok(HR); break; case CZ: gv = str_tok(CZ); break;
+			}
 			std::string inputjson;
 			nlohmann::json postjson = {
 				{ "allow_clicktracking", up->allow_clicktracking },
@@ -1404,9 +1594,6 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 					
 				auto j = nlohmann::json::parse(json);
 				try {
-					#ifdef DEBUG
-					std::cout << e.what() << std::endl;
-					#endif
 					
 					std::string message = j.at("message");
 					int error = j.at("error");
