@@ -1,8 +1,6 @@
 # Vunsur
 Vunsur is a API Wrapper for the Reddit API in C++. It is not finished or half-way done.
 
-### Issues with Vunsur
--
 ### Contributors and people that have helped me
 A thanks to /u/justcool393 for answering questions and troubles I had with the Reddit API
 
