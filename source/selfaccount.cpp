@@ -297,9 +297,9 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->pref_show_snoovatar = js.at("pref_show_snoovatar");
 					usr->pref_top_karma_subreddits = js.at("pref_top_karma_subreddits");
 					
-					auto sub;
+					nlohmann::json sub;
 					try {
-						sub = j.at("subreddit");
+						sub = js.at("subreddit");
 					} catch( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
@@ -308,21 +308,89 @@ Status get_self(AccessData* dat, UserAccount* person)
 						json_error(st, "Error: subreddit does not exist"); return st;
 					}
 					
-					long suspension_expiration_utc;
-					try {
-						if( js.at("suspension_expiration_utc").is_null() ) {
-							suspension_expiration_utc = 0;
-						} else {
-							suspension_expiration_utc = js.at("suspension_expiration_utc");
-						}
-					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
-						std::cerr << e.what() << std::endl;
-						#endif
-						
-						json_error(st, "Error: suspension_expiration_utc does not exist"); return st;
+					usr->subreddit = new UserSubreddit;
+					if( !usr->subreddit ) {
+						bad_alloc_error(s); return s;
 					}
-					usr->suspension_expiration_utc = suspension_expiration_utc;
+					
+					usr->subreddit->audience_target = sub.at("audience_target");
+					
+					nlohmann::json bi = sub.at("banner_img");
+					if( bi.is_null() ) {
+						usr->subreddit->banner_img = "";
+					} else {
+						usr->subreddit->banner_img = sub.at("banner_img");
+					}
+					
+					dsh = sub.at("banner_size");
+					
+					if( dsh.is_array() ) {
+						usr->subreddit->banner_size[0] = dsh[0];
+						usr->subreddit->banner_size[1] = dsh[1];
+					} else {
+						usr->subreddit->banner_size[0] = 0;
+						usr->subreddit->banner_size[1] = 0;
+					}
+					usr->subreddit->description = sub.at("description");
+					usr->subreddit->display_name = sub.at("display_name");
+					usr->subreddit->display_name_prefixed = sub.at("display_name_prefixed");
+					nlohmann::json h_i = sub.at("header_img");
+					if( !h_i.is_null() ) {
+						usr->subreddit->header_img = sub.at("header_img");
+					} else {
+						usr->subreddit->header_img = "";
+					}
+					
+					h_i = sub.at("header_size");
+					if( !h_i.is_array() ) {
+						usr->subreddit->header_size[0] = 0;
+						usr->subreddit->header_size[1] = 0;
+					} else {
+						usr->subreddit->header_size[0] = h_i[0];
+						usr->subreddit->header_size[1] = h_i[1];
+					}
+					
+					dsh = sub.at("icon_img");
+					if( !dsh.is_null() ) {
+						usr->subreddit->icon_img = sub.at("icon_img");
+					} else {
+						usr->subreddit->icon_img = "";
+					}
+					
+					h_i = sub.at("icon_size");
+					if( !h_i.is_array() ) {
+						usr->subreddit->icon_size[0] = 0;
+						usr->subreddit->icon_size[1] = 0;
+					} else {
+						usr->subreddit->icon_size[0] = h_i[0];
+						usr->subreddit->icon_size[1] = h_i[1];
+					}
+					
+					usr->subreddit->is_default_banner = sub.at("is_default_banner");
+					usr->subreddit->is_default_icon = sub.at("is_default_icon");
+					usr->subreddit->key_color = sub.at("key_color");
+					usr->subreddit->link_flair_enabled = sub.at("link_flair_enabled");
+					usr->subreddit->name = sub.at("name");
+					usr->subreddit->over_18 = sub.at("over_18");
+					usr->subreddit->public_description = sub.at("public_description");
+					usr->subreddit->show_media = sub.at("show_media");
+					usr->subreddit->subreddit_type = sub.at("subreddit_type");
+					usr->subreddit->subscribers = sub.at("subscribers");
+					usr->subreddit->title = sub.at("title");
+					usr->subreddit->user_is_banned = sub.at("user_is_banned");
+					usr->subreddit->user_is_contributor = sub.at("user_is_contributor");
+					usr->subreddit->user_is_moderator = sub.at("user_is_moderator");
+					usr->subreddit->user_is_muted = sub.at("user_is_muted");
+					usr->subreddit->user_is_subscriber = sub.at("user_is_subscriber");
+					
+					
+					nlohmann::json sus = js.at("suspension_expiration");
+					if( sus.is_null() ) {
+						usr->suspension_expiration_utc = 0;
+					} else {
+						usr->suspension_expiration_utc = js.at("suspension_expiration_utc");
+					}
+					
 					usr->verified = js.at("verified");
 					
 					
