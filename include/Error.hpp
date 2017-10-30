@@ -3,7 +3,7 @@
 
 #include "include/condition.hpp"
 #include "curl/curl.h"
-
+#include <string>
 
 void set_curl_handle_error( Status& s );
 void set_curl_global_error( Status& s );
@@ -18,5 +18,5 @@ void unknown_error( Status& s );
 void bad_alloc_error( Status& s );
 void not_logged_in(Status& s );
 void no_modhash(Status& s );
-void json_error(Status& s, std::string message)
+void json_error(Status& s, std::string message);
 #endif
