@@ -73,7 +73,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->created_utc = js.at("created_utc");
 					
 					// begin features
-					auto j;
+					nlohmann::json j;
 					try {
 						j = js.at("features");
 					} catch ( nlohmann::json::out_of_range& e ) {
@@ -84,7 +84,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 						json_error(st, "Error: features does not exist"); return st;
 					}
 					
-					usr->activity_service_read = j.at("activity_service_read");
+					/*usr->activity_service_read = j.at("activity_service_read");
 					usr->activity_service_write = j.at("activity_service_write");
 					usr->adblock_test = j.at("adblock_test");
 					usr->ads_auction = j.at("ads_auction");
@@ -99,9 +99,9 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->default_srs_holdout = new Holdout;
 					if(!usr->default_srs_holdout) {
 						bad_alloc_error(st); return st;
-					}
+					}*/
 					
-					auto dsh;
+					nlohmann::json dsh;
 					try {
 						dsh = j.at("default_srs_holdout");
 						
@@ -114,7 +114,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 						return st;
 					}
 					
-					usr->default_srs_holdout->experiment_id = dsh.at("experiment_id");
+					/*usr->default_srs_holdout->experiment_id = dsh.at("experiment_id");
 					usr->default_srs_holdout->owner = dsh.at("owner");
 					usr->default_srs_holdout->variant = dsh.at("variant");
 					
@@ -233,7 +233,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->programmatic_ads = j.at("programmatic_ads");
 					usr->screenview_events = j.at("screenview_events");
 					usr->scroll_events = j.at("scroll_events");
-					usr->search_dark_traffic = j.at("search_dark_traffic");
+					usr->search_dark_traffic = j.at("search_dark_traffic");*/
 					
 					try {
 						dsh = j.at("search_public_traffic");
@@ -246,9 +246,9 @@ Status get_self(AccessData* dat, UserAccount* person)
 						json_error(st, "Error: search_public_traffic does not exist"); return st;
 					}
 					
-					usr->search_public_traffic->experiment_id = j.at("experiment_id");
-					usr->search_public_traffic->owner = j.at("owner");
-					usr->search_public_traffic->variant = j.at("variant");
+					usr->search_public_traffic->experiment_id = dsh.at("experiment_id");
+					usr->search_public_traffic->owner = dsh.at("owner");
+					usr->search_public_traffic->variant = dsh.at("variant");
 					
 					usr->show_amp_link = j.at("show_amp_link");
 					usr->show_recommended_link = j.at("show_recommended_link");
@@ -262,10 +262,10 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->gold_creddits = js.at("gold_creddits");
 					
 					try {
-						if( js.at("gold_expirations").is_null() ) {
+						if( js.at("gold_expiration").is_null() ) {
 							usr->gold_expiration = NULL;
 						} else {
-							usr->gold_expiration = js.at("gold_expirations");
+							usr->gold_expiration = js.at("gold_expiration");
 						}
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
@@ -288,7 +288,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->is_sponsor = js.at("is_sponsor");
 					usr->is_suspended = js.at("is_suspended");
 					usr->link_karma = js.at("link_karma");
-					usr->name = name js.at("name");
+					usr->name = js.at("name");
 					usr->new_modmail_exists = js.at("new_modmail_exists");
 					usr->oauth_client_id = js.at("oauth_client_id");
 					usr->over_18 = js.at("over_18");
@@ -310,7 +310,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					
 					usr->subreddit = new UserSubreddit;
 					if( !usr->subreddit ) {
-						bad_alloc_error(s); return s;
+						bad_alloc_error(st); return st;
 					}
 					
 					usr->subreddit->audience_target = sub.at("audience_target");
@@ -324,12 +324,12 @@ Status get_self(AccessData* dat, UserAccount* person)
 					
 					dsh = sub.at("banner_size");
 					
-					if( dsh.is_array() ) {
-						usr->subreddit->banner_size[0] = dsh[0];
-						usr->subreddit->banner_size[1] = dsh[1];
+					if( dsh.is_array() && !dsh.is_null() ) {
+						usr->subreddit->banner_size.push_back(dsh[0]);
+						usr->subreddit->banner_size.push_back(dsh[1]);
 					} else {
-						usr->subreddit->banner_size[0] = 0;
-						usr->subreddit->banner_size[1] = 0;
+						usr->subreddit->banner_size.push_back(0);
+						usr->subreddit->banner_size.push_back(0);
 					}
 					usr->subreddit->description = sub.at("description");
 					usr->subreddit->display_name = sub.at("display_name");
@@ -342,12 +342,12 @@ Status get_self(AccessData* dat, UserAccount* person)
 					}
 					
 					h_i = sub.at("header_size");
-					if( !h_i.is_array() ) {
-						usr->subreddit->header_size[0] = 0;
-						usr->subreddit->header_size[1] = 0;
+					if( !h_i.is_array() && h_i.is_null() ) {
+						usr->subreddit->header_size.push_back(0);
+						usr->subreddit->header_size.push_back(0);
 					} else {
-						usr->subreddit->header_size[0] = h_i[0];
-						usr->subreddit->header_size[1] = h_i[1];
+						usr->subreddit->header_size.push_back(h_i[0]);
+						usr->subreddit->header_size.push_back(h_i[1]);
 					}
 					
 					dsh = sub.at("icon_img");
@@ -358,12 +358,12 @@ Status get_self(AccessData* dat, UserAccount* person)
 					}
 					
 					h_i = sub.at("icon_size");
-					if( !h_i.is_array() ) {
-						usr->subreddit->icon_size[0] = 0;
-						usr->subreddit->icon_size[1] = 0;
+					if( !h_i.is_array() && h_i.is_null() ) {
+						usr->subreddit->icon_size.push_back(0);
+						usr->subreddit->icon_size.push_back(0);
 					} else {
-						usr->subreddit->icon_size[0] = h_i[0];
-						usr->subreddit->icon_size[1] = h_i[1];
+						usr->subreddit->icon_size.push_back(h_i[0]);
+						usr->subreddit->icon_size.push_back(h_i[1]);
 					}
 					
 					usr->subreddit->is_default_banner = sub.at("is_default_banner");
@@ -384,7 +384,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->subreddit->user_is_subscriber = sub.at("user_is_subscriber");
 					
 					
-					nlohmann::json sus = js.at("suspension_expiration");
+					nlohmann::json sus = js.at("suspension_expiration_utc");
 					if( sus.is_null() ) {
 						usr->suspension_expiration_utc = 0;
 					} else {
@@ -400,7 +400,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 						std::cerr << e.what() << std::endl;
 						#endif
 						
-						std::string message = j.at("message");
+						std::string message = js.at("message");
 						
 						api_error(st, status_code, message);
 						
@@ -433,6 +433,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 		
 		return st;
 	}
+	return st;
 }
 
 Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv )
@@ -580,18 +581,18 @@ Status get_blocked_users(AccessData* dat)
 		CURLcode globalRes = curl_global_init(CURL_GLOBAL_SSL);
 		if(globalRes == CURLE_OK)
 		{
-			/*std::string authhead = "Authorization: ";
-			authhead += std::string(dat->token_type);
-			authhead += " ";
-			authhead += std::string(dat->token);
-			header = curl_slist_append( header, authhead.c_str() );
+		//	std::string authhead = "Authorization: ";
+		//	authhead += std::string(dat->token_type);
+		//	authhead += " ";
+		//	authhead += std::string(dat->token);
+		//	header = curl_slist_append( header, authhead.c_str() );
 			
-			if( dat->modhash != nullptr )
-			{
-				std::string modhash_header = "X-Modhash: ";
-				modhash_header += std::string(dat->modhash);
-				header = curl_slist_append( header, modhash_header.c_str() );
-			}*/
+		//	if( dat->modhash != nullptr )
+		//	{
+		//		std::string modhash_header = "X-Modhash: ";
+		//		modhash_header += std::string(dat->modhash);
+		//		header = curl_slist_append( header, modhash_header.c_str() );
+			//}
 			
 			//curl_get_sets(handle, "https://oauth.reddit.com/api/v1/me/blocked", header, dat->userAgent, jsondat);
 			
@@ -863,12 +864,12 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 				return s;
 			} else {
 				
-				/*std::ofstream out("trophies.json");
-				out << json;
+				//std::ofstream out("trophies.json");
+				//out << json;
 				
-				s.code = NULL;
-				s.cstat = ERROR_NONE;
-				s.message = "test";*/
+				//s.code = NULL;
+				//s.cstat = ERROR_NONE;
+				//s.message = "test";
 				
 				#ifdef DEBUG
 				std::cout << json << std::endl;
