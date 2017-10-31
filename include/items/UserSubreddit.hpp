@@ -1,21 +1,23 @@
 #ifndef USERSUB_HPP
 #define USERSUB_HPP
 
+#include <vector>
+
 
 typedef struct _usrsub {
 	std::string audience_target; // nullifiable
 	std::string banner_img; // nullifiable
-	int banner_size[2];
+	std::vector<int> banner_size; // max 2
 	
 	std::string description;
 	std::string display_name;
 	std::string display_name_prefixed;
 	
 	std::string header_img; // nullifiable
-	int header_size[2]; // nullifiable
+	std::vector<int> header_size; // nullifiable, max 2
 	
 	std::string icon_img; // nullifiable
-	int icon_size[2]; // nullifiable
+	std::vector<int> icon_size; // nullifiable, max 2
 	
 	bool is_default_banner;
 	bool is_default_icon;
