@@ -102,6 +102,11 @@ Status get_self(AccessData* dat, UserAccount* person)
 					}*/
 					
 					nlohmann::json dsh;
+					usr->default_srs_holdout = new Holdout;
+					if( !usr->default_srs_holdout ) {
+						bad_alloc_error(st);
+						return st;
+					}
 					try {
 						dsh = j.at("default_srs_holdout");
 						
@@ -109,12 +114,12 @@ Status get_self(AccessData* dat, UserAccount* person)
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->default_srs_holdout;
 						json_error(st, "Error: default_srs_holdout does not exist");
 						return st;
 					}
 					
-					/*usr->default_srs_holdout->experiment_id = dsh.at("experiment_id");
+					usr->default_srs_holdout->experiment_id = dsh.at("experiment_id");
 					usr->default_srs_holdout->owner = dsh.at("owner");
 					usr->default_srs_holdout->variant = dsh.at("variant");
 					
@@ -137,7 +142,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->geopopular_gb_holdout;
 						json_error(st, "Error: geopopular_gb_holdout does not exist"); return st;
 					}
 					
@@ -145,13 +150,17 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->geopopular_gb_holdout->owner = dsh.at("owner");
 					usr->geopopular_gb_holdout->variant = dsh.at("variant");
 					
+					usr->geopopular_ie_holdout = new Holdout;
+					if( !usr->geopopular_ie_holdout ) {
+						bad_alloc_error(st); return st;
+					}
 					try {
 						dsh = j.at("geopopular_ie_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->geopopular_ie_holdout;
 						json_error(st, "Error: geopopular_ie_holdout does not exist"); return st;
 					}
 					
@@ -159,13 +168,17 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->geopopular_ie_holdout->owner = dsh.at("owner");
 					usr->geopopular_ie_holdout->variant = dsh.at("variant");
 					
+					usr->geopopular_in_holdout = new Holdout;
+					if( !usr->geopopular_in_holdout ) {
+						bad_alloc_error(st); return st;
+					}
 					try {
 						dsh = j.at("geopopular_in_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->geopopular_in_holdout;
 						json_error(st, "Error: geopopular_in_holdout does not exist"); return st;
 					}
 					
@@ -173,25 +186,32 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->geopopular_in_holdout->owner = dsh.at("owner");
 					usr->geopopular_in_holdout->variant = dsh.at("variant");
 					
+					nlohmann::json geopop_tw;
+					usr->geopopular_tw_holdout = new Holdout;
+					if( !usr->geopopular_tw_holdout ) {
+						bad_alloc_error(st);
+						return st;
+					}
 					try {
-						dsh = j.at("geopopular_tw_holdout");
+						geopop_tw = j.at("geopopular_tw_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->geopopular_tw_holdout;
 						json_error(st, "Error: geopopular_tw_holdout does not exist"); return st;
 					}
 					
-					usr->geopopular_tw_holdout->experiment_id = dsh.at("experiment_id");
-					usr->geopopular_tw_holdout->owner = dsh.at("owner");
-					usr->geopopular_tw_holdout->variant = dsh.at("variant");
+					usr->geopopular_tw_holdout->experiment_id = geopop_tw.at("experiment_id");
+					usr->geopopular_tw_holdout->owner = geopop_tw.at("owner");
+					usr->geopopular_tw_holdout->variant = geopop_tw.at("variant");
+
 					
 					usr->give_hsts_grants = j.at("give_hsts_grants");
 					usr->https_redirect = j.at("https_redirect");
-					usr->inbox_count = j.at("inbox_count");
-					usr->interest_targeting = j.at("interesting_target");
-					usr->legacy_search_prefs = j.at("legacy_search_prefs");
+					usr->inbox_count = js.at("inbox_count");
+					usr->interest_targeting = j.at("interest_targeting");
+					usr->legacy_search_pref = j.at("legacy_search_pref");
 					usr->listing_service_rampup = j.at("listing_service_rampup");
 					usr->live_happening_now = j.at("live_happening_now");
 					usr->live_orangereds = j.at("live_orangereds");
@@ -200,13 +220,18 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->mobile_native_banner = j.at("mobile_native_banner");
 					usr->mobile_web_targeting = j.at("mobile_web_targeting");
 					
+					usr->mweb_xpromo_ad_feed_ios = new Holdout;
+					if( usr->mweb_xpromo_ad_feed_ios ) {
+						bad_alloc_error(st);
+						return st;
+					}
 					try {
 						dsh = j.at("mweb_xpromo_ad_feed_ios");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->mweb_xpromo_ad_feed_ios;
 						json_error(st, "Error: mweb_xpromo_ad_feed_ios does not exist"); return st;
 					}
 					
@@ -233,8 +258,13 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->programmatic_ads = j.at("programmatic_ads");
 					usr->screenview_events = j.at("screenview_events");
 					usr->scroll_events = j.at("scroll_events");
-					usr->search_dark_traffic = j.at("search_dark_traffic");*/
+					usr->search_dark_traffic = j.at("search_dark_traffic");
 					
+					usr->search_public_traffic = new Holdout;
+					if( !usr->search_public_traffic ) {
+						bad_alloc_error(st);
+						return st;
+					}
 					try {
 						dsh = j.at("search_public_traffic");
 						
@@ -242,7 +272,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						
+						delete usr->search_public_traffic;
 						json_error(st, "Error: search_public_traffic does not exist"); return st;
 					}
 					
