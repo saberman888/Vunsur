@@ -45,7 +45,7 @@ class UserAccount : public Created, BaseThing {
 		bool https_redirect;
 		bool inbox_push;
 		bool interest_targeting;
-		bool legacy_search_prefs;
+		bool legacy_search_pref;
 		bool listing_service_rampup;
 		bool live_happening_now;
 		bool live_orangereds;
@@ -89,7 +89,7 @@ class UserAccount : public Created, BaseThing {
 		bool has_subscribed;
 		bool has_verified_email;
 		bool hide_from_robots;
-		//std::string id;
+		std::string id;
 		bool in_beta;
 		int inbox_count;
 		bool is_employee;
@@ -98,7 +98,7 @@ class UserAccount : public Created, BaseThing {
 		bool is_sponsor;
 		bool is_suspended;
 		int link_karma;
-		//std::string name;
+		std::string name;
 		bool new_modmail_exists;
 		std::string oauth_client_id;
 		bool over_18;
