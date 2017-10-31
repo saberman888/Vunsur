@@ -84,7 +84,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 						json_error(st, "Error: features does not exist"); return st;
 					}
 					
-					/*usr->activity_service_read = j.at("activity_service_read");
+					usr->activity_service_read = j.at("activity_service_read");
 					usr->activity_service_write = j.at("activity_service_write");
 					usr->adblock_test = j.at("adblock_test");
 					usr->ads_auction = j.at("ads_auction");
@@ -96,17 +96,14 @@ Status get_self(AccessData* dat, UserAccount* person)
 					
 					usr->chat = j.at("chat");
 					
-					usr->default_srs_holdout = new Holdout;
-					if(!usr->default_srs_holdout) {
-						bad_alloc_error(st); return st;
-					}*/
-					
 					nlohmann::json dsh;
 					usr->default_srs_holdout = new Holdout;
+					
 					if( !usr->default_srs_holdout ) {
 						bad_alloc_error(st);
 						return st;
 					}
+					
 					try {
 						dsh = j.at("default_srs_holdout");
 						
@@ -221,7 +218,7 @@ Status get_self(AccessData* dat, UserAccount* person)
 					usr->mobile_web_targeting = j.at("mobile_web_targeting");
 					
 					usr->mweb_xpromo_ad_feed_ios = new Holdout;
-					if( usr->mweb_xpromo_ad_feed_ios ) {
+					if( !usr->mweb_xpromo_ad_feed_ios ) {
 						bad_alloc_error(st);
 						return st;
 					}
