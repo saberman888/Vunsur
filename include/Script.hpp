@@ -20,6 +20,7 @@ class ScriptAccess {
 
 		// The constructor
 		ScriptAccess(  const char* client_id, const char* secret, const char* username, const char* password, const char* userAgent  ); 
+		ScriptAccess(); // An empty constructor for those not using client_ids, secrets and usernames/passwords
 		~ScriptAccess(); // The deconstructor
 		// This function authorized with reddit with the "main data"
 		// and returns data to access the ret of the API
@@ -63,14 +64,17 @@ class ScriptAccess {
 		Status ClearFlairTemplates( std::string subreddit, FlairType ft);
 		
 		
-		friend Status authenticate( ScriptAccess* src, AccessData* acs );
 		
 		std::string getUsername() { return this->username; }
 		std::string getClientId() { return this->client_id; }
 		bool isLoggedIn() { return this->loginAccess; }
 		UserAccount* Me() { return this->acc; }
+		std::string Scope() { return this->acd->scope; }
+		struct tm* ExpireTime() { return this->acd->expire; }
 		
 	private:
+		friend Status authenticate( ScriptAccess* src, AccessData* acs );
+		
 		// Our main data to enter the Reddit API
 		std::string client_id;
 		std::string secret;
