@@ -51,6 +51,11 @@ ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const cha
 	
 }
 
+ScriptAccess::ScriptAccess() {
+	this->loginAccess = false;
+	this->modhash_access = false;
+}
+
 // The destructor
 ScriptAccess::~ScriptAccess(){
 	// If acd exists then delete it.
@@ -93,9 +98,6 @@ Status ScriptAccess::getMe()
 		// If it is successful then return Succ/Fail data into me and return it
 		me = get_self(this->acd, this->acc);
 		
-		// Before returning lets get the mod hash
-		this->acd->modhash = this->acc->modhash;
-		this->modhash_access = true;
 		return me;
 	} else {
 		// If the user is not logged in then set code to NULL
@@ -239,6 +241,16 @@ Status ScriptAccess::giveGold( std::string username ) {
 		s.code = NULL;
 		s.cstat = ERROR_NOT_LOGGED_IN;
 		s.message = "Error: Not logged in";
+		return s;
+	}
+}
+
+Status ScriptAccess::gild( std::string fullname ) {
+	if( this->isLoggedIn() ) {
+		return gild(fullname);
+	} else {
+		Status s;
+		not_logged_in(s);
 		return s;
 	}
 }
