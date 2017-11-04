@@ -59,6 +59,7 @@ class ScriptAccess {
 		// ********* GOLD FUNCTIONS **********
 		// This function gives gold a user
 		Status giveGold( std::string username );
+		Status gild( std::string fullname );
 		
 		// ********* FLAIR FUNCTIONS *********
 		Status ClearFlairTemplates( std::string subreddit, FlairType ft);
