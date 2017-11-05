@@ -65,8 +65,8 @@ typedef struct _prefs {
 	bool top_karma_subreddits;
 	bool use_global_defaults;
 	Region g;
-	std::string other_theme;
-	std::string theme_selector;
+	//std::string other_theme;
+	//std::string theme_selector;
 	
 	
 }UserPrefs;
