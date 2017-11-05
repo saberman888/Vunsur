@@ -22,7 +22,7 @@ typedef struct _prefs {
 	bool email_messages;
 	bool enable_default_themes;
 	std::string geopopular;
-	//bool hide_abusive_comments;
+	//bool hide_abusive_comments; -- this variable for some reason stop existing :/
 	bool hide_ads;
 	bool hide_downs;
 	bool hide_from_robots;
@@ -43,6 +43,7 @@ typedef struct _prefs {
 	bool monitor_mentions;
 	bool newwindow;
 	bool no_profanity;
+	bool no_video_autoplay;
 	int num_comments;
 	int numsites;
 	bool organic;
@@ -64,6 +65,8 @@ typedef struct _prefs {
 	bool top_karma_subreddits;
 	bool use_global_defaults;
 	Region g;
+	std::string other_theme;
+	std::string theme_selector;
 	
 	
 }UserPrefs;
