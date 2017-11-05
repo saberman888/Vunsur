@@ -1051,7 +1051,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 			
 			curl_easy_cleanup(handle);
 			curl_global_cleanup();
-			
+			std::cout << 1 << std::endl;
 			if( result != CURLE_OK ) {
 				
 				set_curl_strerror(s,result);
@@ -1152,6 +1152,9 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					bool threaded_modmail = j.at("threaded_modmail");
 					bool top_karma_subreddits = j.at("top_karma_subreddits");
 					bool use_global_defaults = j.at("use_global_defaults");
+					bool no_video_autoplay = j.at("no_video_autoplay");
+					std::string other_theme = j.at("other_theme");
+					std::string theme_selector = j.at("theme_selector");
 					
 					up->accept_pms = accept_pms;
 					up->allow_clicktracking = allow_clicktracking;
@@ -1224,8 +1227,9 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					up->threaded_modmail = threaded_modmail;
 					up->top_karma_subreddits = top_karma_subreddits;
 					up->use_global_defaults = use_global_defaults;
-					
-					
+					up->no_video_autoplay = no_video_autoplay;
+					up->other_theme = other_theme;
+					up->theme_selector = theme_selector;
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
@@ -1586,7 +1590,7 @@ Status get_messagingprefs( AccessData* dat ) {
 	}
 	
 }
-// not finished
+// not tested
 Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 	Status s;
 	int state;
@@ -1628,9 +1632,34 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 			
 			std::string gv;
 			switch(up->g) {
-				case GLOBAL: gv = str_tok(GLOBAL); break; case US: gv = str_tok(US); break; case AU: gv = str_tok(AU); break;
-				case BG: gv = str_tok(BG); break; case CA: gv = str_tok(CA); break; case CL: gv = str_tok(CL); break;
-				case CO: gv = str_tok(CO); break; case HR: gv = str_tok(HR); break; case CZ: gv = str_tok(CZ); break;
+				case GLOBAL: gv = "GLOBAL"; break; case US: gv = "US"; break; case AU: gv = "AU"; break;
+				case BG: gv = "BG"; break; case CA: gv = "CA"; break; case CL: gv = "CL"; break;
+				case CO: gv = "CO"; break; case HR: gv = "HR"; break; case CZ: gv = "CZ"; break;
+				case FI: gv = "FI"; break; case GR: gv = "GR"; break; case HU: gv = "HU"; break;
+				case IS: gv = "IS"; break; case _IN: gv = "IN"; break; case IE: gv = "IE"; break;
+				case JP: gv = "JP"; break; case MY: gv = "MY"; break; case MX: gv = "MX"; break;
+				case NZ: gv = "NZ"; break; case PH: gv = "PH"; break; case PL: gv = "PL"; break;
+				case PT: gv = "PT"; break; case PR: gv = "PR"; break; case RO: gv = "RO"; break;
+				case RS: gv = "RS"; break; case SG: gv = "SG"; break; case SE: gv = "SE"; break;
+				case TW: gv = "TW"; break; case TH: gv = "TH"; break; case TR: gv = "TR"; break;
+				case GB: gv = "GB"; break; case US_DE: gv = "US_DE"; break; case US_DC: gv = "US_DC"; break;
+				case US_WI: gv = "US_WI"; break; case US_WV: gv = "US_WV"; break; case US_HI: gv = "US_HI"; break;
+				case US_FL: gv = "US_FL"; break; case US_WY: gv = "US_WY"; break; case US_NH: gv = "US_NH"; break;
+				case US_NJ: gv = "US_NJ"; break; case US_NM: gv = "US_NM"; break; case US_TX: gv = "US_TX"; break;
+				case US_LA: gv = "US_LA"; break; case US_NC: gv = "US_NC"; break; case US_ND: gv = "US_ND"; break;
+				case US_NE: gv = "US_NE"; break; case US_TN: gv = "US_TN"; break; case US_NY: gv = "US_NY"; break;
+				case US_PA: gv = "US_PA"; break; case US_CA: gv = "US_CA"; break; case US_NV: gv = "US_NV"; break;
+				case US_VA: gv = "US_VA"; break; case US_CO: gv = "US_CO"; break; case US_AK: gv = "US_AK"; break;
+				case US_AL: gv = "US_AL"; break; case US_AR: gv = "US_AR"; break; case US_VT: gv = "US_VT"; break;
+				case US_IL: gv = "US_IL"; break; case US_GA: gv = "US_GA"; break; case US_IN: gv = "US_IN"; break;
+				case US_IA: gv = "US_IA"; break; case US_OK: gv = "US_OK"; break; case US_AZ: gv = "US_AZ"; break;
+				case US_ID: gv = "US_ID"; break; case US_CT: gv = "US_CT"; break; case US_ME: gv = "US_ME"; break;
+				case US_MD: gv = "US_MD"; break; case US_MA: gv = "US_MA"; break; case US_OH: gv = "US_OH"; break;
+				case US_UT: gv = "US_UT"; break; case US_MO: gv = "US_MO"; break; case US_MN: gv = "US_MN"; break;
+				case US_MI: gv = "US_MI"; break; case US_RI: gv = "US_RI"; break; case US_KS: gv = "US_KS"; break;
+				case US_MT: gv = "US_MT"; break; case US_MS: gv = "US_MS"; break; case US_SC: gv = "US_SC"; break;
+				case US_KY: gv = "US_KY"; break; case US_OR: gv = "US_OR"; break; case US_SD: gv = "US_SD"; break;
+				default: gv = "GLOBAL"; break;
 			}
 			std::string inputjson;
 			nlohmann::json postjson = {
@@ -1644,10 +1673,49 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				{ "domain_details", up->domain_details },
 				{ "email_digests", up->email_digests },
 				{ "enable_default_themes", up->enable_default_themes },
-				//{ "g", str_tok(up->g) },
-				{ "hide_ads", up->hide_ads }
+				{ "g", gv },
+				{ "hide_ads", up->hide_ads },
+				{ "hide_downs", up->hide_downs },
+				{ "hide_from_robots", up->hide_from_robots },
+				{ "hide_fromlocationbar", up->hide_from_robots },
+				{ "hide_ups", up->hide_ups },
+				{ "highlight_controversial", up->highlight_controversial },
+				{ "highlight_new_comments", up->highlight_new_comments },
+				{ "ignore_suggested_sort", up->ignore_suggested_sort },
+				{ "label_nsfw", up->label_nsfw },
+				{ "lang", up->lang },
+				{ "legacy_search", up->legacy_search },
+				{ "live_orangereds", up->live_orangereds },
+				{ "mark_messages_read", up->mark_messages_read },
+				{ "media", up->media },
+				{ "media_preview", up->media_preview },
+				{ "min_comment_score", up->min_comment_score },
+				{ "monitor_mentions", up->monitor_mentions },
+				{ "newwindow", up->newwindow },
+				{ "no_profanity", up->no_profanity },
+				{ "no_video_autoplay", up->no_video_autoplay },
+				{ "num_comments", up->num_comments },
+				{ "numsites", up->numsites },
+				{ "organic", up->organic },
+				{ "other_theme", up->other_theme },
+				{ "over_18", up->over_18 },
+				{ "private_feeds", up->private_feeds },
+				{ "public_votes", up->public_votes },
+				{ "research", up->research },
+				{ "search_include_over_18", up->search_include_over_18 },
+				{ "show_flair", up->show_flair },
+				{ "show_gold_expiration", up->show_gold_expiration },
+				{ "show_link_flair", up->show_link_flair },
+				{ "show_promote", up->show_promote },
+				{ "show_stylesheets", up->show_stylesheets },
+				{ "show_trending", up->show_trending },
+				{ "store_visits", up->store_visits },
+				{ "theme_selector", up->theme_selector},
+				{ "threaded_messages", up->threaded_messages },
+				{ "threaded_modmail", up->threaded_modmail },
+				{ "top_karma_subreddits", up->top_karma_subreddits },
+				{ "use_global_defaults", up->use_global_defaults }
 			};
-			//std::cout << std::setw(4) << postjson;
 			
 			inputjson = postjson.dump();
 			//inputjson = "{ \"num_comments\" : 500 }";
