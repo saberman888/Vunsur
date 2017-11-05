@@ -1026,7 +1026,8 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 			set_curl_global_error(s);
 			return s;
 		} else {
-			struct curl_slist* header;
+			print("Setting up");
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
 			authhead += " ";
@@ -1043,7 +1044,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 			#ifdef DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
-			
+			print("performing")
 			result = curl_easy_perform(handle);
 			
 			curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &state);
@@ -1057,7 +1058,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				set_curl_strerror(s,result);
 				return s;
 			} else if( result == CURLE_OK ) {
-				
+				print("after performance")
 				#ifdef DEBUG
 				std::cout << json << std::endl;
 				std::cout << state << std::endl;
@@ -1153,8 +1154,8 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					bool top_karma_subreddits = j.at("top_karma_subreddits");
 					bool use_global_defaults = j.at("use_global_defaults");
 					bool no_video_autoplay = j.at("no_video_autoplay");
-					std::string other_theme = j.at("other_theme");
-					std::string theme_selector = j.at("theme_selector");
+					//std::string other_theme = j.at("other_theme");
+					//std::string theme_selector = j.at("theme_selector");
 					
 					up->accept_pms = accept_pms;
 					up->allow_clicktracking = allow_clicktracking;
@@ -1228,8 +1229,8 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					up->top_karma_subreddits = top_karma_subreddits;
 					up->use_global_defaults = use_global_defaults;
 					up->no_video_autoplay = no_video_autoplay;
-					up->other_theme = other_theme;
-					up->theme_selector = theme_selector;
+					//up->other_theme = other_theme;
+					//up->theme_selector = theme_selector;
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
@@ -1697,7 +1698,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				{ "num_comments", up->num_comments },
 				{ "numsites", up->numsites },
 				{ "organic", up->organic },
-				{ "other_theme", up->other_theme },
+				//{ "other_theme", up->other_theme },
 				{ "over_18", up->over_18 },
 				{ "private_feeds", up->private_feeds },
 				{ "public_votes", up->public_votes },
@@ -1710,7 +1711,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				{ "show_stylesheets", up->show_stylesheets },
 				{ "show_trending", up->show_trending },
 				{ "store_visits", up->store_visits },
-				{ "theme_selector", up->theme_selector},
+				//{ "theme_selector", up->theme_selector},
 				{ "threaded_messages", up->threaded_messages },
 				{ "threaded_modmail", up->threaded_modmail },
 				{ "top_karma_subreddits", up->top_karma_subreddits },
@@ -1718,9 +1719,6 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 			};
 			
 			inputjson = postjson.dump();
-			//inputjson = "{ \"num_comments\" : 500 }";
-			//std::cout << inputjson << std::endl;
-			
 			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, inputjson.c_str() );
 			//curl_easy_setopt( handle, CURLOPT_RETURNTRANSFER, 1 );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
