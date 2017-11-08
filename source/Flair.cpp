@@ -1,5 +1,6 @@
 #include "include/flair/Flair.hpp"
 #include <iostream>
+#include <fstream>
 
 Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType ft )
 {
@@ -20,16 +21,17 @@ Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType 
 			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
+			authhead += " ";
 			authhead += std::string(dat->token);
 			
 			header = curl_slist_append( header, authhead.c_str() );
 			
-			std::string modhash = "X-Modhash: ";
-			modhash += std::string(dat->modhash);
+			//std::string modhash = "X-Modhash: ";
+			//modhash += std::string(dat->modhash);
 			
-			header = curl_slist_append( header, modhash.c_str() );
+			//header = curl_slist_append( header, modhash.c_str() );
 			
-			std::string URL = "https://oauth.reddit.com/api/v1/";
+			std::string URL = "https://oauth.reddit.com/r/";
 			URL += subreddit;
 			URL += "/api/clearflairtemplates";
 			
@@ -61,6 +63,7 @@ Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType 
 			result = curl_easy_perform(handle);
 			
 			curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &state );
+			s.code = state;
 			
 			curl_easy_cleanup(handle);
 			curl_global_cleanup();
@@ -75,8 +78,10 @@ Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType 
 				std::cout << json << std::endl;
 				#endif
 				
-				//std::ofstream out("clearflairtemplate.json");
-				//out << json;
+				#ifdef OUTJSON
+				std::ofstream out("clearflairtemplate.json");
+				out << json;
+				#endif
 				
 				s.cstat = ERROR_NONE;
 				s.message = "";
