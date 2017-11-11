@@ -11,6 +11,7 @@
 #include "include/Error.hpp"
 #include "include/base/Types.hpp"
 #include "include/items/SubredditInfo.hpp"
+#include "json.hpp"
 
 Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* subi );
 
