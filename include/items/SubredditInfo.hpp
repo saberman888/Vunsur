@@ -52,7 +52,6 @@ typedef struct subinfo : public BaseThing, public Created {
 	std::string url;
 	bool user_can_flair_in_sr;
 	bool user_flair_css_class;
-	std::string user_flair_css_class;
 	bool user_flair_enabled_in_sr;
 	std::string user_flair_text;
 	bool user_has_favorited;
