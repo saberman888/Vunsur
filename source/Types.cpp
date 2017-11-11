@@ -4,16 +4,24 @@
 SortType determineSortType(std::string obj)
 {
 	SortType t;
-	switch(	obj.c_str() ) {
-		case "Confidence": t = Confidence; break;
-		case "Old": t = Old; break;
-		case "Top": t = Top; break;
-		case "qa" : t = QA; break;
-		case "Controversial": t = Controversial; break;
-		case "New": t = New; break;
-		default: t = None; break;
-		
-			
+	if( obj == "Confidence") {
+		t = Confidence;
+	} else if( obj == "Old") {
+		t = Old;
+	}
+	
+	if( obj == "Top" ) {
+		t = Top;
+	} else if ( obj == "qa" ){
+		t = QA;
+	}
+	
+	if( obj == "Controversial" ) {
+		t = Controversial;
+	} else if ( obj == "New" ) {
+		t = New;
+	} else {
+		t = None;
 	}
 	return t;
 }
