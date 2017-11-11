@@ -46,14 +46,12 @@ ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const cha
 		throw NoUserAgent();
 	}
 	this->userAgent = userAgent;
-	this->modhash_access = false;
 	// Done
 	
 }
 
 ScriptAccess::ScriptAccess() {
 	this->loginAccess = false;
-	this->modhash_access = false;
 }
 
 // The destructor
@@ -258,17 +256,23 @@ Status ScriptAccess::gild( std::string fullname ) {
 Status ScriptAccess::ClearFlairTemplates( std::string subreddit, FlairType ft) 
 {
 	Status s;
-	if( this->isLoggedIn() == true  && this->ModhashExists() == true ) {
+	if( this->isLoggedIn() == true) {
 		return clear_flair_templates(this->acd, subreddit, ft);
 	} else {
 		if( this->isLoggedIn() == false )
 			not_logged_in(s); return s;
-			
-		if( this->ModhashExists() == false )
-			no_modhash(s); return s;
 	}
 }
 
+
+Status ScriptAccess::getAboutSubreddit( std::string subreddit, SubredditInfo* sub ) {
+	Status s;
+	if( this->isLoggedIn() ) {
+		return subreddit_about(this->acd, subreddit, sub);
+	} else {
+		not_logged_in(s); return s;
+	}
+}
 // Authenticate function connects to reddit to get a access token so the user can
 // have the priviledge of using Reddit's API. It takes a ScriptAccess* variable and an 
 // AccessData and with it POST requests an access token
