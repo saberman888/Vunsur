@@ -8,6 +8,7 @@
 #include "include/gold/gold.hpp"
 #include "include/Info.hpp"
 #include "include/flair/Flair.hpp"
+#include "include/subreddit/subreddit.hpp"
 
 #include <string>
 #include "curl/curl.h"
@@ -59,10 +60,13 @@ class ScriptAccess {
 		// ********* GOLD FUNCTIONS **********
 		// This function gives gold a user
 		Status giveGold( std::string username );
-		Status gild( std::string fullname );
+		Status gild( std::string fullname ); // gilds a post
 		
 		// ********* FLAIR FUNCTIONS *********
 		Status ClearFlairTemplates( std::string subreddit, FlairType ft);
+		
+		//********** SUBREDDIT FUNCTIONS *********
+		Status getAboutSubreddit( std::string subreddit );
 		
 		
 		
@@ -91,9 +95,6 @@ class ScriptAccess {
 		// and it will determine your functionality access accross
 		// this API
 		bool loginAccess;
-		// A boolean for modhash access
-		bool modhash_access;
-		bool ModhashExists() { return this->modhash_access; }
 		// The acd variable holds access_token, token type, scope and expire time
 		AccessData* acd;
 
