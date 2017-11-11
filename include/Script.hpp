@@ -66,7 +66,7 @@ class ScriptAccess {
 		Status ClearFlairTemplates( std::string subreddit, FlairType ft);
 		
 		//********** SUBREDDIT FUNCTIONS *********
-		Status getAboutSubreddit( std::string subreddit );
+		Status getAboutSubreddit( std::string subreddit, SubredditInfo *sub );
 		
 		
 		
