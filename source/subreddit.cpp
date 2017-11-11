@@ -154,7 +154,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					nlohmann::json submit_text_html;
 					submit_text_html = data.at("submit_text_html");
 					if( !submit_text_html.is_null() ) {
-						subi->submit_text_html = subsubmit_text_html.dump();
+						subi->submit_text_html = submit_text_html.dump();
 					} else {
 						subi->submit_text_html = "";
 					}
