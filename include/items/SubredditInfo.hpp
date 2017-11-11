@@ -47,7 +47,7 @@ typedef struct subinfo : public BaseThing, public Created {
 	std::string submit_text_label;
 	std::string subreddit_type;
 	int subscribers;
-	VunType suggested_comment_sort; // Nullifiable
+	SortType suggested_comment_sort; // Nullifiable
 	std::string title;
 	std::string url;
 	bool user_can_flair_in_sr;
