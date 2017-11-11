@@ -110,7 +110,13 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					//subi->allow_videogifs = data.at("allow_videogifs");
 					
 					subi->audience_target = data.at("audience_target");
-					subi->banner_img = data.at("banner_img");
+					
+					nlohmann::json banner_img = data.at("banner_img");
+					if( !banner_img.is_null() ) {
+						subi->banner_img = data.at("banner_img");
+					} else {
+						subi->banner_img = "";
+					}
 					
 					nlohmann::json banner_size;
 					banner_size = data.at("banner_size");
@@ -127,10 +133,22 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					subi->created = data.at("created");
 					subi->created_utc = data.at("created_utc");
 					subi->description = data.at("description");
-					subi->description_html = data.at("description_html");
+					
+					nlohmann::json description_html = data.at("description_html");
+					if( !description_html.is_null() ) {
+						subi->description_html = data.at("description_html");
+					} else {
+						subi->description_html = "";
+					}
 					subi->display_name = data.at("display_name");
 					subi->display_name_prefixed = data.at("display_name_prefixed");
-					subi->header_img = data.at("header_img");
+					
+					nlohmann::json header_img = data.at("header_img");
+					if( !header_img.is_null() ) {
+						subi->header_img = data.at("header_img");
+					} else {
+						subi->header_img = "";
+					}
 					
 					nlohmann::json header_size;
 					header_size = data.at("header_size");
@@ -140,7 +158,13 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 						}	
 					}
 					
-					subi->header_title = data.at("header_title");
+					nlohmann::json header_title = data.at("header_title");
+					if( !header_title.is_null() ) {
+						subi->header_title = data.at("header_title");
+					} else {
+						subi->header_title = "";
+					}
+					
 					subi->hide_ads = data.at("hide_ads");
 					subi->icon_img = data.at("icon_img");
 					
@@ -154,13 +178,17 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					}
 					
 					subi->id = data.at("id");
+					try {
 					
-					nlohmann::json is_enrolled_in_new_modmail;
-					
-					is_enrolled_in_new_modmail = data.at("is_enrolled_in_new_modmail");
-					if( !is_enrolled_in_new_modmail.is_null() ) {
-						subi->is_enrolled_in_new_modmail = data.at("is_enrolled_in_modmail");
-					} else {
+						nlohmann::json is_enrolled_in_new_modmail;
+						
+						is_enrolled_in_new_modmail = data.at("is_enrolled_in_new_modmail");
+						if( !is_enrolled_in_new_modmail.is_null() ) {
+							subi->is_enrolled_in_new_modmail = data.at("is_enrolled_in_modmail");
+						} else {
+							subi->is_enrolled_in_new_modmail = false;
+						}
+					} catch ( nlohmann::json::out_of_range& e ) {
 						subi->is_enrolled_in_new_modmail = false;
 					}
 					
@@ -177,7 +205,13 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					subi->show_media_preview = data.at("show_media_preview");
 					subi->spoilers_enabled = data.at("spoilers_enabled");
 					subi->submission_type = data.at("submission_type");
-					subi->submit_link_label = data.at("submit_link_label");
+					
+					nlohmann::json submit_link_label = data.at("submit_link_label");
+					if ( !submit_link_label.is_null() ) {
+						subi->submit_link_label = data.at("submit_link_label");
+					} else {
+						subi->submit_link_label = "";
+					}
 					subi->submit_text = data.at("submit_text");
 					
 					nlohmann::json submit_text_html;
@@ -186,6 +220,13 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 						subi->submit_text_html = data.at("submit_text_html");
 					} else {
 						subi->submit_text_html = "";
+					}
+					
+					nlohmann::json submit_text_label = data.at("submit_text_label");
+					if( !submit_text_label.is_null() ) {
+						subi->submit_text_label = data.at("submit_text_label");
+					} else {
+						subi->submit_text_label = "";
 					}
 					
 					subi->subreddit_type = data.at("subreddit_type");
@@ -203,9 +244,14 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					
 					subi->title = data.at("title");
 					subi->url = data.at("url");
-					subi->user_can_flair_in_sr = data.at("user_can_flair_in_sr");
 					
-					subi->user_flair_css_class = data.at("user_flair_css_class");
+					nlohmann::json user_can_flair_in_sr = data.at("user_can_flair_in_sr");
+					if( !user_can_flair_in_sr.is_null() ) {
+						subi->user_can_flair_in_sr = data.at("user_can_flair_in_sr");
+					} else {
+						subi->user_can_flair_in_sr = false;
+					}
+					
 					
 					nlohmann::json user_flair_css_class = data.at("user_flair_css_class");
 					if( !user_flair_css_class.is_null() ) {
@@ -231,8 +277,21 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					subi->user_is_subscriber = data.at("user_is_subscriber");
 					subi->user_sr_flair_enabled = data.at("user_sr_flair_enabled");
 					subi->user_sr_theme_enabled = data.at("user_sr_theme_enabled");
-					subi->whitelist_status = data.at("whitelist_status");
-					subi->wiki_enabled = data.at("wiki_enabled");
+					
+					nlohmann::json whitelist_status = data.at("whitelist_status");
+					if( !whitelist_status.is_null() ) {
+						subi->whitelist_status = data.at("whitelist_status");
+					} else {
+						subi->whitelist_status = "";
+					}
+					
+					nlohmann::json wiki_enabled = data.at("wiki_enabled");
+					if( !wiki_enabled.is_null() ) {
+						subi->wiki_enabled = data.at("wiki_enabled");
+					} else {
+						subi->wiki_enabled = false;
+					}
+					
 					
 					
 				} catch ( nlohmann::json::out_of_range& e ) {
@@ -247,10 +306,6 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 						
 						return s;
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
-						std::cerr << "Error: Unknown error" << std::endl;
-						#endif
-						
 						unknown_error(s);
 						return s;
 					}
