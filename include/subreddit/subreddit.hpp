@@ -10,8 +10,9 @@
 #include "include/authdata.hpp"
 #include "include/Error.hpp"
 #include "include/base/Types.hpp"
+#include "include/item/SubredditInfo.hpp"
 
-Status subreddit_about( AccessData* acd, std::string subreddit );
+Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* subi );
 
 
 
