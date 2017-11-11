@@ -80,7 +80,35 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					
 					subi->allow_discovery = data.at("allow_discovery");
 					subi->allow_images = data.at("allow_images");
-					subi->allow_videos = data.at("allow_videos");
+					
+					/*
+					
+						The Json values in allow_videos and allow_videogifs
+						are in beta. In non-opted communities these values
+						do not appear, so when they aren't present the api
+						assigns false to these values 
+						
+					*/
+					
+					try {
+						bool allow_videos = data.at("allow_videos");
+						
+						subi->allow_videos = allow_videos;
+					} catch ( nlohmann::json::out_of_range& e ) {
+						subi->allow_videos = false;
+					}
+					
+					
+					try {
+						bool allow_videogifs = data.at("allow_videogifs");
+						subi->allow_videogifs = allow_videogifs;
+					} catch ( nlohmann::json::out_of_range& e ) {
+						subi->allow_videogifs = false;
+					}
+					
+					//subi->allow_videos = data.at("allow_videos");
+					//subi->allow_videogifs = data.at("allow_videogifs");
+					
 					subi->audience_target = data.at("audience_target");
 					subi->banner_img = data.at("banner_img");
 					
@@ -155,7 +183,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					nlohmann::json submit_text_html;
 					submit_text_html = data.at("submit_text_html");
 					if( !submit_text_html.is_null() ) {
-						subi->submit_text_html = submit_text_html.dump();
+						subi->submit_text_html = data.at("submit_text_html");
 					} else {
 						subi->submit_text_html = "";
 					}
@@ -167,7 +195,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					suggested_comment_sort = data.at("suggested_comment_sort");
 					
 					if( !suggested_comment_sort.is_null() ) {
-						SortType dst = determineSortType(suggested_comment_sort.dump());
+						SortType dst = determineSortType(data.at("suggested_comment_sort"));
 						subi->suggested_comment_sort = dst;
 					} else {
 						subi->suggested_comment_sort = None;
@@ -176,9 +204,25 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					subi->title = data.at("title");
 					subi->url = data.at("url");
 					subi->user_can_flair_in_sr = data.at("user_can_flair_in_sr");
+					
 					subi->user_flair_css_class = data.at("user_flair_css_class");
+					
+					nlohmann::json user_flair_css_class = data.at("user_flair_css_class");
+					if( !user_flair_css_class.is_null() ) {
+						subi->user_flair_css_class = data.at("user_flair_css_class");
+					} else {
+						subi->user_flair_css_class = "";
+					}
+					
 					subi->user_flair_enabled_in_sr = data.at("user_flair_enabled_in_sr");
-					subi->user_flair_text = data.at("user_flair_text");
+					
+					nlohmann::json user_flair_text = data.at("user_flair_text");
+					if( !user_flair_text.is_null() ) {
+						subi->user_flair_text = data.at("user_flair_text");
+					} else {
+						subi->user_flair_text = "";
+					}
+					
 					subi->user_has_favorited = data.at("user_has_favorited");
 					subi->user_is_banned = data.at("user_is_banned");
 					subi->user_is_contributor = data.at("user_is_contributor");
