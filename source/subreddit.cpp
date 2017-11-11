@@ -59,7 +59,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 				out << json;
 				#endif
 				
-				nlohmann::json j;
+				nlohmann::json j = nlohmann::json::parse(json);
 				try {
 				
 					nlohmann::json data = j.at("data");
@@ -75,7 +75,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					if( advertiser_category.is_null() ) {
 						subi->advertiser_category = "";
 					} else {
-						subi->advertiser_category = advertiser_category.dump();
+						subi->advertiser_category = data.at("advertiser_category");
 					}
 					
 					subi->allow_discovery = data.at("allow_discovery");
@@ -126,13 +126,14 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					}
 					
 					subi->id = data.at("id");
+					
 					nlohmann::json is_enrolled_in_new_modmail;
 					
 					is_enrolled_in_new_modmail = data.at("is_enrolled_in_new_modmail");
 					if( !is_enrolled_in_new_modmail.is_null() ) {
-						subi->is_enrolled_in_new_modmail = false;
+						subi->is_enrolled_in_new_modmail = data.at("is_enrolled_in_modmail");
 					} else {
-						subi->is_enrolled_in_new_modmail = true;
+						subi->is_enrolled_in_new_modmail = false;
 					}
 					
 					subi->key_color = data.at("key_color");
@@ -160,7 +161,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					}
 					
 					subi->subreddit_type = data.at("subreddit_type");
-					subi->subscribers = data.at("subscripbers");
+					subi->subscribers = data.at("subscribers");
 					
 					nlohmann::json suggested_comment_sort;
 					suggested_comment_sort = data.at("suggested_comment_sort");
