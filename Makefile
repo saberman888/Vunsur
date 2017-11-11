@@ -6,8 +6,8 @@ SHARED_LIB := $(GCC) -shared
 
 LINK_LIB :=  -lcurl -lcurldll 
 FLAGS := -w -Wall -Wextra -Wfatal-errors -march=native
-SRC := source/Script.cpp source/Info.cpp source/selfaccount.cpp source/condition.cpp source/user.cpp source/gold.cpp source/Error.cpp source/Flair.cpp source/UserAccount.cpp source/subreddit.cpp
-OBJ := Info.o Script.o selfaccount.o condition.o user.o gold.o Error.o Flair.o UserAccount.o subreddit.o
+SRC := source/Script.cpp source/Info.cpp source/selfaccount.cpp source/condition.cpp source/user.cpp source/gold.cpp source/Error.cpp source/Flair.cpp source/UserAccount.cpp source/subreddit.cpp source/Types.cpp
+OBJ := Info.o Script.o selfaccount.o condition.o user.o gold.o Error.o Flair.o UserAccount.o subreddit.o Types.o
 
 
 
