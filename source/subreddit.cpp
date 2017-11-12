@@ -166,7 +166,13 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					}
 					
 					subi->hide_ads = data.at("hide_ads");
-					subi->icon_img = data.at("icon_img");
+					
+					nlohmann::json icon_img = data.at("icon_img");
+					if( !icon_img.is_null() ) {
+						subi->icon_img = data.at("icon_img");
+					} else {
+						subi->icon_img = "";
+					}
 					
 					nlohmann::json icon_size;
 					icon_size = data.at("icon_size");
@@ -198,7 +204,15 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 					subi->name = data.at("name");
 					subi->over18 = data.at("over18");
 					subi->public_description = data.at("public_description");
-					subi->public_description_html = data.at("public_description_html");
+					
+					nlohmann::json public_description_html = data.at("public_description_html");
+					if( !public_description_html.is_null() ) {
+						subi->public_description_html = data.at("public_description_html");
+					} else {
+						subi->public_description_html = "";
+					}
+					
+					//subi->public_description_html = data.at("public_description_html");
 					subi->public_traffic = data.at("public_traffic");
 					subi->quarantine = data.at("quarantine");
 					subi->show_media = data.at("show_media");
