@@ -38,6 +38,7 @@ Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType 
 			curl_easy_setopt( handle, CURLOPT_URL, URL.c_str() );
 			curl_easy_setopt( handle, CURLOPT_POST, 1L );
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
+			curl_easy_setopt( handle, CURLOPT_USERAGENT, dat->userAgent.c_str() );
 			
 			std::string flair_type;
 			switch( ft ) {
