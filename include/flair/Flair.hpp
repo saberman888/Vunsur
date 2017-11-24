@@ -16,5 +16,6 @@ typedef enum tflair {
 }FlairType;
 
 Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType ft );
+Status delete_flair( AccessData* dat, std::string subreddit, std::string flair_template_name );
 
 #endif
