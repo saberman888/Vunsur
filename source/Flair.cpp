@@ -123,7 +123,7 @@ Status delete_flair( AccessData* dat, std::string subreddit, std::string flair_t
 			
 			std::string URL = "https://oauth.reddit.com/r/";
 			URL += subreddit;
-			URL += "/deleteflair";
+			URL += "/api/deleteflair";
 			
 			nlohmann::json postdata = {
 				{ "api_type", "json" },
@@ -156,11 +156,27 @@ Status delete_flair( AccessData* dat, std::string subreddit, std::string flair_t
 			{
 				set_curl_strerror(s,result); return s;
 			} else {
-				#ifdef OUTJSOn
+				#ifdef OUTJSON
 				std::ofstream out("delete_flair.json");
 				out << json;
 				#endif
 				
+				nlohmann::json j = nlohmann::json::parse(json);
+				try {
+					std::string message = j.at("message");
+					int error = j.at("error");
+					
+					api_error(s,error,message);
+					
+					return s;
+				} catch( nlohmann::json::out_of_range& e )
+				{
+					#ifdef DEBUG
+					std::cerr << e.what() << std::endl;
+					#endif
+					
+					unknown_error(s); return s;
+				}
 				s.cstat = ERROR_NONE;
 				s.message = "";
 				return s;
