@@ -264,6 +264,16 @@ Status ScriptAccess::ClearFlairTemplates( std::string subreddit, FlairType ft)
 	}
 }
 
+Status ScriptAccess::DeleteFlair( std::string subreddit, std::string flair )
+{
+	Status s;
+	if( this->isLoggedIn() == true )
+	{
+		return delete_flair(this->acd, subreddit, flair );
+	} else {
+		not_logged_in(s); return s;
+	}
+}
 
 Status ScriptAccess::getAboutSubreddit( std::string subreddit, SubredditInfo* sub ) {
 	Status s;
@@ -271,6 +281,29 @@ Status ScriptAccess::getAboutSubreddit( std::string subreddit, SubredditInfo* su
 		return subreddit_about(this->acd, subreddit, sub);
 	} else {
 		not_logged_in(s); return s;
+	}
+}
+
+Status ScriptAccess::getSubredditSetting(std::string subreddit)
+{
+	Status s;
+	if( this->isLoggedIn() ) {
+		return subreddit_about_edit(this->acd, subreddit);
+		
+	} else {
+		not_logged_in(s); return s;
+	}
+}
+
+Status ScriptAccess::getUserSaved( std::string username )
+{
+	Status s;
+	if( this->isLoggedIn() )
+	{
+		return get_about_saved(this->acd, username);
+	} else {
+		not_logged_in(s);
+		return s;
 	}
 }
 // Authenticate function connects to reddit to get a access token so the user can
