@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "include/items/Types.hpp"
+#include "include/base/Types.hpp"
 
 template<class T>
 struct Listing {
