@@ -64,9 +64,14 @@ class ScriptAccess {
 		
 		// ********* FLAIR FUNCTIONS *********
 		Status ClearFlairTemplates( std::string subreddit, FlairType ft);
+		Status DeleteFlair( std::string subreddit, std::string flair_name );
 		
 		//********** SUBREDDIT FUNCTIONS *********
 		Status getAboutSubreddit( std::string subreddit, SubredditInfo *sub );
+		Status getSubredditSetting( std::string subreddit );
+		
+		//********** USER FUNCTIONS ***************/
+		Status getUserSaved( std::string username ); // Does not work for now
 		
 		
 		
