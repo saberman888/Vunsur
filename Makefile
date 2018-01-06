@@ -18,11 +18,18 @@ all:
 	$(GCC) $(INC) $(FLAGS) -c $(SRC) $(LINK_LIB)
 	$(STATIC_LIB) $(BIN) $(OBJS)
 	
+	del *.o
+	
 	$(GCC) $(INC) $(FLAGS) $(DEBUG_MACROS) -c $(SRC) $(LINK_LIB)
-	$(STATIC_LIB) $(BIN_DEBUG) $(OBJS)
+	$(STATIC_LIB) $(BIN_DEBUG) $(OBJS) 
+	
+	del *.o
+	
+	$(GCC) $(INC) $(INC_EXAMPLE) $(FLAGS) -c examples\example.cpp $(LINK_LIB) -lvunsur
+	$(GCC) $(INC) $(INC_EXAMPLE) -o examples\Example example.o -lvunsur $(LINK_LIB)
 	
 	$(GCC) $(INC) $(INC_EXAMPLE) $(FLAGS) -c examples\example.cpp $(LINK_LIB) -lvunsur_debug
-	$(GCC) $(INC) $(INC_EXAMPLE) -o examples\Example $(LINK_LIB) -lvunsur_debug
+	$(GCC) $(INC) $(INC_EXAMPLE) -o examples\Example_debug example.o -lvunsur_debug $(LINK_LIB)
 	
 	del *.o
 
