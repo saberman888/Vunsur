@@ -4,6 +4,8 @@
 /* dir includes */
 #include "authdata.hpp"
 #include "Exceptions.hpp"
+#include "sceExceptions.hpp"
+#include "condition.hpp"
 #include "Info.hpp"
 #include "other.hpp"
 
