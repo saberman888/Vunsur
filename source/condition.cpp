@@ -10,3 +10,4 @@ bool Status::all_good()
 {
 	return ( this->code == 200 && this->cstat == ERROR_NONE );
 }
+
