@@ -28,11 +28,8 @@ class Status
 		EStatus cstat;
 		int code;
 		
-		Status();
-		~Status();
 		bool all_good();
+		void print_state();
 };
 
-// Prints out status
-void print_status(Status s);
 #endif
