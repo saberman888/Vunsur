@@ -70,6 +70,7 @@ Status get_self(AccessData* dat, UserAccount* person){
 					usr->comment_karma = js.at("comment_karma");
 					usr->created = js.at("created");
 					usr->created_utc = js.at("created_utc");
+					usr->kind = Account;
 					
 					// begin features
 					nlohmann::json j;
@@ -1618,15 +1619,11 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 			
 			std::string default_comment_sort;
 			switch( up->default_comment_sort ) {
-				case Confidence: default_comment_sort = "confidence"; break;
-				case Old: default_comment_sort = "old"; break;
-				case Top: default_comment_sort = "top"; break;
-				case QA: default_comment_sort = "qa"; break;
-				case Controversial: default_comment_sort = "controversial"; break;
-				case New: default_comment_sort = "new"; break;
+				case Confidence: default_comment_sort = "confidence"; break; case Old: default_comment_sort = "old"; break;
+				case Top: default_comment_sort = "top"; break; case QA: default_comment_sort = "qa"; break;
+				case Controversial: default_comment_sort = "controversial"; break; case New: default_comment_sort = "new"; break;
 				default: default_comment_sort = "confidence"; break;
 			}
-			
 			std::string gv;
 			switch(up->g) {
 				case GLOBAL: gv = "GLOBAL"; break; case US: gv = "US"; break; case AU: gv = "AU"; break;
@@ -1658,6 +1655,11 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				case US_KY: gv = "US_KY"; break; case US_OR: gv = "US_OR"; break; case US_SD: gv = "US_SD"; break;
 				default: gv = "GLOBAL"; break;
 			}
+			
+			#ifdef DEBUG
+			std::cout << "Region: " << gv << std::endl;
+			#endif
+			
 			std::string inputjson;
 			nlohmann::json postjson = {
 				{ "allow_clicktracking", up->allow_clicktracking },
