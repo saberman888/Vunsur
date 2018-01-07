@@ -9,7 +9,7 @@
 #include <string>
 
 // This structure that stores user information for any account
-class UserAccount : public Created, BaseThing {
+class UserAccount : public Created, public BaseThing {
 	public:
 		UserAccount();
 		~UserAccount();
