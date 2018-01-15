@@ -90,7 +90,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->chat = j.at("chat");
 					
 					nlohmann::json dsh;
-					usr->default_srs_holdout = new Holdout;
+					usr->default_srs_holdout = new (std::nothrow) Holdout;
 					
 					if( !usr->default_srs_holdout ) {
 						bad_alloc_error(st);
@@ -119,7 +119,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->force_https = j.at("force_https");
 					usr->geopopular = j.at("geopopular");
 					
-					usr->geopopular_gb_holdout = new Holdout;
+					usr->geopopular_gb_holdout = new (std::nothrow) Holdout;
 					if(!usr->geopopular_gb_holdout) {
 						bad_alloc_error(st); return st;
 					}
@@ -140,7 +140,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->geopopular_gb_holdout->owner = dsh.at("owner");
 					usr->geopopular_gb_holdout->variant = dsh.at("variant");
 					
-					usr->geopopular_ie_holdout = new Holdout;
+					usr->geopopular_ie_holdout = new (std::nothrow) Holdout;
 					if( !usr->geopopular_ie_holdout ) {
 						bad_alloc_error(st); return st;
 					}
@@ -158,7 +158,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->geopopular_ie_holdout->owner = dsh.at("owner");
 					usr->geopopular_ie_holdout->variant = dsh.at("variant");
 					
-					usr->geopopular_in_holdout = new Holdout;
+					usr->geopopular_in_holdout = new (std::nothrow) Holdout;
 					if( !usr->geopopular_in_holdout ) {
 						bad_alloc_error(st); return st;
 					}
@@ -177,7 +177,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->geopopular_in_holdout->variant = dsh.at("variant");
 					
 					nlohmann::json geopop_tw;
-					usr->geopopular_tw_holdout = new Holdout;
+					usr->geopopular_tw_holdout = new (std::nothrow) Holdout;
 					if( !usr->geopopular_tw_holdout ) {
 						bad_alloc_error(st);
 						return st;
@@ -210,7 +210,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->mobile_native_banner = j.at("mobile_native_banner");
 					usr->mobile_web_targeting = j.at("mobile_web_targeting");
 					
-					usr->mweb_xpromo_ad_feed_ios = new Holdout;
+					usr->mweb_xpromo_ad_feed_ios = new (std::nothrow) Holdout;
 					if( !usr->mweb_xpromo_ad_feed_ios ) {
 						bad_alloc_error(st);
 						return st;
@@ -250,7 +250,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->scroll_events = j.at("scroll_events");
 					usr->search_dark_traffic = j.at("search_dark_traffic");
 					
-					usr->search_public_traffic = new Holdout;
+					usr->search_public_traffic = new (std::nothrow) Holdout;
 					if( !usr->search_public_traffic ) {
 						bad_alloc_error(st);
 						return st;
@@ -328,7 +328,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						json_error(st, "Error: subreddit does not exist"); return st;
 					}
 					
-					usr->subreddit = new UserSubreddit;
+					usr->subreddit = new ( std::nothrow ) UserSubreddit;
 					if( !usr->subreddit ) {
 						bad_alloc_error(st); return st;
 					}
@@ -526,7 +526,7 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv ){
 							std::string subreddit = elem.at("sr");
 							
 							//SubredditKarma* sbkarma = new SubredditKarma;
-							struct sbkarma* sbkarma_ = new struct sbkarma;
+							struct sbkarma* sbkarma_ = new (std::nothrow) struct sbkarma;
 							if(!sbkarma_)
 							{
 								bad_alloc_error(s);
@@ -772,7 +772,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 						for( auto& elem : children )
 						{
 							auto k = nlohmann::json::parse( std::string(elem.dump()) );
-							BasicUser* fr = new BasicUser;
+							BasicUser* fr = new (std::nothrow) BasicUser;
 							if(!fr) {
 								bad_alloc_error(s);
 								
@@ -943,7 +943,7 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 								} catch ( nlohmann::json::type_error& e ) {
 									id = "";
 								}
-								Trophy *t = new Trophy;
+								Trophy *t = new (std::nothrow) Trophy;
 								if(!t){
 									bad_alloc_error(s);
 									return s;
@@ -1331,7 +1331,7 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 							std::string id = elem.at("id");
 							std::string name = elem.at("name");
 							
-							BasicUser *bu = new BasicUser;
+							BasicUser *bu = new (std::nothrow) BasicUser;
 							if(!bu) {
 								bad_alloc_error(s);
 								return s;
@@ -1457,7 +1457,7 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 							std::string id = elem.at("id");
 							long date = elem.at("date");
 							
-							BasicUser* up = new BasicUser;
+							BasicUser* up = new (std::nothrow) BasicUser;
 							if(!up) {
 								bad_alloc_error(s);
 								return s;
