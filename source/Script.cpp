@@ -94,10 +94,16 @@ Status ScriptAccess::getMe()
 	Status me;
 	if( this->loginAccess == true)
 	{
+		// allocate a new UserAccount to use in get_self function
+		this->acc = new UserAccount();
+		if(!this->acc)
+		{
+			bad_alloc_error(me); return me;
+		}
 		// If it this person is logged in then proceed to attempt to get user data
 		// If it is successful then return Succ/Fail data into me and return it
 		me = get_self(this->acd, this->acc);
-		
+		//std::cout << this->acc->name;
 		return me;
 	} else {
 		// If the user is not logged in then set code to NULL
