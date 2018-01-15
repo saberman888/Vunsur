@@ -99,7 +99,6 @@ class UserAccount : public Created, public BaseThing {
 		bool is_sponsor;
 		bool is_suspended;
 		int link_karma;
-		std::string name;
 		bool new_modmail_exists;
 		std::string oauth_client_id;
 		bool over_18;
