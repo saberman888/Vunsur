@@ -25,7 +25,7 @@
 #define str_tok(X) #X
 #define print(x) std::cout << x << std::endl;
 
-Status get_self(AccessData* dat, UserAccount* person);
+Status get_self(AccessData* dat, UserAccount* usr);
 Status get_blocked_users(AccessData* dat); // Does not work for some reason
 Status get_friends( AccessData* dat, std::vector< BasicUser* > *f );
 Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv );
