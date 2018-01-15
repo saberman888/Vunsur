@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Status get_self(AccessData* dat, UserAccount* person){
+Status get_self(AccessData* dat, UserAccount* usr){
 	CURL *handle;
 	CURLcode result;
 	Status st;
@@ -58,13 +58,6 @@ Status get_self(AccessData* dat, UserAccount* person){
 				#endif
 				
 				auto js = nlohmann::json::parse(returndata);
-
-				UserAccount* usr = new UserAccount;
-				if(!usr) {
-					bad_alloc_error(st);
-					//delete usr;
-					return st;
-				}
 				
 				try {
 					usr->comment_karma = js.at("comment_karma");
