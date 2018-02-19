@@ -1,15 +1,15 @@
 GCC := g++ -std=c++11
 STATIC_LIB := ar rcs
-INC := -IC:\MinGW\include -LC:\MinGW\lib -I .\include\Vunsur
-INC_EXAMPLE := -I .\include\Vunsur -L .\lib
+INC := -IC:/MinGW/include -LC:/MinGW/lib -I ./include/Vunsur -I .
+INC_EXAMPLE := -I ./include/Vunsur -L ./lib
 DEBUG_MACROS := -DDEBUG=1 -DOUTJSON=1
-FLAGS := -w -Wall -Wextra -Wfatal-errors -march=native
+FLAGS := -w -Wall -Wextra -march=native -Wfatal-errors
 
 BIN := lib/libvunsur.a
 BIN_DEBUG := lib/libvunsur_debug.a
-OBJS := Error.o Flair.o Info.o Script.o Types.o UserAccount.o account.o condition.o gold.o linkncomms.o other.o selfaccount.o subreddit.o user.o 
+OBJS := oauth.o Error.o Flair.o Info.o Script.o Types.o UserAccount.o account.o condition.o gold.o linkncomms.o other.o selfaccount.o subreddit.o user.o Comment.o
 
-SRC := source/Error.cpp source/Flair.cpp source/Info.cpp source/Script.cpp source/Types.cpp source/UserAccount.cpp source/account.cpp source/condition.cpp source/gold.cpp source/linkncomms.cpp source/other.cpp source/selfaccount.cpp source/subreddit.cpp source/subreddit.cpp source/user.cpp
+SRC := source/Error.cpp source/Flair.cpp source/Info.cpp source/Script.cpp source/Types.cpp source/UserAccount.cpp source/account.cpp source/condition.cpp source/gold.cpp source/linkncomms.cpp source/other.cpp source/selfaccount.cpp source/subreddit.cpp source/subreddit.cpp source/user.cpp source/oauth.cpp source/Comment.cpp
 SRC_EXAMPLE := ./example/example.cpp
 
 LINK_LIB := -lcurl -lcurldll
