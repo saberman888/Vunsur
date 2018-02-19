@@ -12,7 +12,7 @@
 */
 union BlendObject {
 	Post* p;
-	Comemnt* c;
+	VunComment* c;
 };
 
 struct Blend {
