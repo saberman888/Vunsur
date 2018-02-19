@@ -5,7 +5,7 @@
 // The reason why the parameter variables are
 // const char* types is because they can be denied easier. In a char* and const char* you can put NULL or
 // nullptr while with a std::string you cannot
-ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const char* username, const char* password, const char* userAgent )
+ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const char* username, const char* password, const char* userAgent ) : OAUTH()
 {
 
 	// I put the conditions in the variable keyvarif because it was easier to type it out and whatnot
@@ -18,26 +18,19 @@ ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const cha
 	} else {
 	
 		// If client_id and secret are there then assign them to the class' equivalent
-		this->client_id = client_id;
-		this->secret = secret;
+		this->client_id = std::string(client_id);
+		this->secret = std::string(secret);
 	}
-	// Acd is the structure that holds the access tokenm, it's type, scope and expire time
-	// It is nullptr because we don't need to do much with it right now
-	this->acd = nullptr;
-	// Next pass_null checks if the username and password are tere
-	bool pass_null = ( (username == NULL || username == nullptr) && (password == NULL || password == nullptr) );
-	if( pass_null == true )
+	// check if the username and password are tere
+	if( (username == NULL || username == nullptr) && (password == NULL || password == nullptr) == true )
 	{
-		// If the username and password are not there then set loginAccess to false
+		// If the username and password are not there then set loggedin to false
 		// This bool exists so we can see if the user is logged in or not
-		this->loginAccess = false;
+		this->loggedin = false;
 	} else {
-		// If the username and password are there then set 
-		// loginAccess to true and assign username and password
-		// to the class' equivalent and store then there
-		this->loginAccess = true;
-		this->username = username;
-		this->password = password;
+		// Set username and password, but do not set loggedin to true because the user has not successfully authorized with yet.
+		this->username = std::string(username);
+		this->password = std::string(password);
 	}
 	// Like client_id and secret, the user Agent is a requirment
 	// If it is there then assign it to the class' equivalent
@@ -47,14 +40,10 @@ ScriptAccess::ScriptAccess( const char* client_id, const char* secret, const cha
 		// Throw this exception if the userAgent isn't there
 		throw NoUserAgent();
 	}
-	this->userAgent = userAgent;
+	this->user_agent = std::string(userAgent);
 	// Done
-	
 }
 
-ScriptAccess::ScriptAccess() {
-	this->loginAccess = false;
-}
 
 // The destructor
 ScriptAccess::~ScriptAccess(){
@@ -70,21 +59,17 @@ Status ScriptAccess::AuthorizeWithReddit()
 	// Status s variable is the variable which holds information on
 	// the success of this function and failure
 	Status s;
-	// Allocate a new AccessData instance 
-	// and pass it to authenticate function
-	this->acd = new AccessData; 
-	// Also assign the userAgent to acd
-	this->acd->userAgent = this->userAgent;
+
 	// authenticate returns information about the success and/or failure
 	// of the function and stores it in s. If it has succeeded then 
 	// it should return a code 200, and if not then delete acd
-	s = authenticate(this, acd);
-	if( s.code != 200)
-		delete this->acd;
+	s = authenticate();
+	/*if( s.code != 200)
+		delete this->acd;*/
 	// If the message is an invalid grant then the user is 
-	// not logged in or failed to do so, and set loginAccess to false
+	// not logged in or failed to do so, and set loggedin to false
 	if( s.message == "invalid_grant" )
-		this->loginAccess = false;
+		this->loggedin = false;
 	// Whether or not it has succeeded return s
 	return s;
 }
@@ -92,7 +77,7 @@ Status ScriptAccess::AuthorizeWithReddit()
 Status ScriptAccess::getMe()
 {
 	Status me;
-	if( this->loginAccess == true)
+	if( this->loggedin == true)
 	{
 		// allocate a new UserAccount to use in get_self function
 		this->acc = new UserAccount();
@@ -119,7 +104,7 @@ Status ScriptAccess::getMe()
 // BlockedUsers wraps around the function get_blocked_users from account.hpp and acount.cpp
 // It is not quite finished yet, and it acts the same way as the other functions: Me(), Friends() and etc
 Status ScriptAccess::getBlockedUsers(){ // does not work
-	if( this->loginAccess == true){
+	if( this->loggedin == true){
 	
 		return get_blocked_users( this->acd );
 	}
@@ -137,7 +122,7 @@ Status ScriptAccess::getBlockedUsers(){ // does not work
 // and parses them into the vector, and in the end it returns a Status type
 Status ScriptAccess::getFriends(std::vector< BasicUser* > * f )
 {
-	if( this->loginAccess == true ) {
+	if( this->loggedin == true ) {
 		return get_friends( this->acd,  f);
 	} else {
 		Status s;
@@ -156,7 +141,7 @@ Status ScriptAccess::getUserAbout( std::string username, UserAccount* ua )
 // SubredditKarma wraps around the function get_karma from account.hpp/cpp and it returns a list of karma by subreddit
 Status ScriptAccess::getSubredditKarma( std::vector<SubredditKarma*> *sbv )
 {
-	if( this->loginAccess == true )
+	if( this->loggedin == true )
 	{
 		return get_karma( this->acd, sbv );
 	} else {
@@ -350,7 +335,7 @@ Status ScriptAccess::editComment(std::string id, std::string text)
 // Authenticate function connects to reddit to get a access token so the user can
 // have the priviledge of using Reddit's API. It takes a ScriptAccess* variable and an 
 // AccessData and with it POST requests an access token
-Status authenticate( ScriptAccess* src, AccessData* acs )
+Status ScriptAccess::authenticate()
 {
 	
 	// Declare result, handle and returndata
@@ -378,24 +363,31 @@ Status authenticate( ScriptAccess* src, AccessData* acs )
 			curl_easy_setopt( handle, CURLOPT_URL, "https://www.reddit.com/api/v1/access_token" );
 			curl_easy_setopt( handle, CURLOPT_POST, 1L );
 			
-			// These params will hold the username and password
-			std::string params = "grant_type=password&username=";
-			// and if the loginAccess is true then append the user's
+			println(0)
+			//std::string params = this->generate_scriptparams();
+			#ifdef DEBUG
+			//std::cout << params << std::endl;
+			#endif
+			
+			// These params will hold the username, password and permissions
+			std::string params = this->bind_params();
+			// and if the loggedin is true then append the user's
 			// username and password to the params
-			if(src->loginAccess == true)
-			{
-				params += src->username;
-				params += "&password=" + src->password;
-			}
+			std::string userpwd;
+			if( this->loggedin )
+				userpwd = this->generate_usrpwd(); // Set the client and secret with userpwd
+				
+		
 			// then set the params into the POST request
 			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, params.c_str() );
-			// Set the client and secret with userpwd
-			std::string userpwd = src->client_id + ":" + src->secret;
+			println(1);
+			
+			std::cout << userpwd << std::endl;
 			curl_easy_setopt( handle, CURLOPT_USERPWD, userpwd.c_str() );
 			
-			
+			println(2);
 			// Set the userAgent
-			curl_easy_setopt( handle, CURLOPT_USERAGENT, src->userAgent.c_str() );
+			curl_easy_setopt( handle, CURLOPT_USERAGENT, this->user_agent.c_str() );
 			// Set SSL_VERIFYPEER to 0L
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			
@@ -448,7 +440,9 @@ Status authenticate( ScriptAccess* src, AccessData* acs )
 				std::string type;
 				int expires_in;
 				// and then attempt to extract the needed data
+				println("json");
 				try{
+					print("assigned");
 					acctoken = j.at("access_token");
 					scope = j.at("scope");
 					type = j.at("token_type");
@@ -456,6 +450,7 @@ Status authenticate( ScriptAccess* src, AccessData* acs )
 						
 				} catch( nlohmann::json::out_of_range& e ) {
 					try {
+						println("error 1");
 						// If extracting the values fails then try to extract error values
 						std::string error_msg = j.at("message");
 						int code = j.at("error");
@@ -471,6 +466,7 @@ Status authenticate( ScriptAccess* src, AccessData* acs )
 						return s; // return 
 					} catch( nlohmann::json::out_of_range& e ) {
 						try {
+							println("error 2");
 							// If obtaining the error fails then maybe
 							// the error is an unsupported_grant_type
 							std::string error = j.at("error");
@@ -496,6 +492,7 @@ Status authenticate( ScriptAccess* src, AccessData* acs )
 							return s;
 						} catch( nlohmann::json::out_of_range& e )
 						{
+							println("error 3");
 							// If everything fails then return an Unknown error
 							unknown_error(s);
 							
@@ -504,28 +501,41 @@ Status authenticate( ScriptAccess* src, AccessData* acs )
 					}
 				}
 				
-				
+				println("continue")
+				// Allocate acd so we can store our token information
+				this->acd = new AccessData;
+				if( !this->acd )
+				{
+					bad_alloc_error(s);
+					return s;
+				}
 				// Since we got all the values we need assign them
 				// to the proper places in the acs struct
-				acs->token = acctoken;
-				acs->token_type = type;
-				acs->scope = scope;
+				this->acd->token = acctoken;
+				this->acd->token_type = type;
+				this->acd->scope = scope;
+				this->acd->userAgent = user_agent;
 				
+				
+				println("c1");
 				// Convert the expired time to time now
-				time_t t = time(0);
-				struct tm * now = localtime(&t);
+				/*time_t t = time(0);
+				struct tm * now = localtime(&t);*/
 				// Since most expire times are 3600, which is 1 hour
 				// add 1 to the hour variable to the now struct.
 				// There might be more times, but as for now I don't know
-				if(expires_in == 3600)
-					now->tm_hour += 1;
+				println("c2");
+				/*if(expires_in == 3600)
+					now->tm_hour += 1;*/
 				
-				acs->expire = now;
+				//this->acd->expire = now;
+				this->loggedin = true;
 				// set status
 				s.code = status_code;
 				s.cstat = ERROR_NONE;
 				s.message = "";
 				// and reeeeeeeeeeeeturn!
+				println("done");
 				return s;
 			}
 		} else {

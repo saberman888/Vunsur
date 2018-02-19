@@ -113,6 +113,7 @@ Status get_user_trophies(AccessData* acd, std::string username) {
 			
 			result = curl_easy_perform(handle);
 			curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &state );
+			curl_slist_free_all(header);
 			curl_easy_cleanup(handle);
 			curl_global_cleanup();
 			
@@ -163,17 +164,16 @@ Status get_about_saved( AccessData* dat, std::string username )
 			authheader += " ";
 			authheader += dat->token;
 			
-			curl_slist *header = nullptr;
-			curl_slist_append(header, authheader.c_str() );
+			struct curl_slist *header = nullptr;
+			header = curl_slist_append(header, authheader.c_str() );
+			
 			
 			std::string url = "https://oauth.reddit.com/user/";
 			url += username;
-			url += "/saved";
+			url += "/saved?limit=25";
 			
-			std::string parameters = "?limit=100";
 			
 			curl_easy_setopt( handle, CURLOPT_URL, url.c_str() );
-			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, parameters.c_str() );
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
 			curl_easy_setopt( handle, CURLOPT_USERAGENT, dat->userAgent.c_str() );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
@@ -190,6 +190,7 @@ Status get_about_saved( AccessData* dat, std::string username )
 			s.code = state;
 			curl_easy_cleanup( handle );
 			curl_global_cleanup();
+			curl_slist_free_all(header);
 			
 			if( result != CURLE_OK )
 			{
@@ -202,12 +203,15 @@ Status get_about_saved( AccessData* dat, std::string username )
 				out << json;
 				#endif
 				
-				nlohmann::json j = nlohmann::json::parse(json);
+				/*nlohmann::json j = nlohmann::json::parse(json);
 				try {
 					std::string message = j.at("message");
 				} catch ( nlohmann::json::out_of_range& e ) {
-					// pass
-				}
+					#ifdef DEBUG
+					std::cerr << e.what() << std::endl;
+					#endif
+					api_error(s,state,"Unknown error"); return s;
+				}*/
 				
 				s.cstat = ERROR_NONE;
 				s.message = "";
