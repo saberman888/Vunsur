@@ -4,14 +4,15 @@
 #include <string>
 #include <ctime>
 
-typedef struct authdat
+class AccessData
 {
-	std::string token;
-	std::string token_type;
-	std::string scope;
-	struct tm * expire;
-	std::string userAgent;
-	char* modhash;
-}AccessData;
+	public:
+
+		std::string token;
+		std::string token_type;
+		std::string scope;
+		struct tm * expire;
+		std::string userAgent;
+};
 
 #endif

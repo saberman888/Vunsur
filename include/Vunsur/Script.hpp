@@ -8,6 +8,7 @@
 #include "condition.hpp"
 #include "Info.hpp"
 #include "other.hpp"
+#include "oauth.hpp"
 
 /* account includes */
 #include "account/selfaccount.hpp"
@@ -18,6 +19,7 @@
 #include "subreddit/sub/flair/Flair.hpp"
 #include "subreddit/sub/subreddit.hpp"
 #include "subreddit/sub/linkncomms.hpp"
+#include "subreddit/comments/Comment.hpp"
 
 /* basic compiler includes */
 #include <string>
@@ -25,8 +27,9 @@
 #include "json.hpp"
 #include <ctime>
 
+#define println(x) std::cout << x << std::endl;
 // The ScriptAccess class is for Script based Reddit api applications
-class ScriptAccess {
+class ScriptAccess : private OAUTH{
 	public:
 
 		// The constructor
@@ -97,40 +100,33 @@ class ScriptAccess {
 		Status Scopes() { return scopes(this->acd); }
 		
 		
+		/* OAUTH stuff */
+		void operator<<(const Permission &p) { this->permissions.push_back(p); }
+		void add(Permission p) { this->permissions.push_back(p); }
+		
+		
 		std::string getUsername() { return this->username; }
 		std::string getClientId() { return this->client_id; }
-		bool isLoggedIn() { return this->loginAccess; }
+		bool isLoggedIn() { return this->loggedin; }
 		UserAccount* Me() { return this->acc; }
 		std::string Scope() { return this->acd->scope; }
 		struct tm* ExpireTime() { return this->acd->expire; }
 		
 	private:
-		friend Status authenticate( ScriptAccess* src, AccessData* acs );
-		
-		// Our main data to enter the Reddit API
-		std::string client_id;
-		std::string secret;
-		// If the username and password are not
-		// provided then loginAccess will be false
-		std::string username;
-		std::string password;
-		std::string userAgent; // This is absolutely necessary, if not provided then NoUserAgent exception will be thrown
-		
+		Status authenticate();
+		AccessData *acd;
 		// A UserAccount instance for the logged in user
 		UserAccount* acc;
 		// This bool indicates whether the class has login access
 		// and it will determine your functionality access accross
 		// this API
-		bool loginAccess;
-		
-		// The acd variable holds access_token, token type, scope and expire time
-		AccessData* acd;
+		bool loggedin;
 
 };
 
 // From Info.cpp, this writes buffer data into src - a string
 //size_t writedat(char* buffer, size_t size, size_t nmemb, std::string& src);
 // Declaration for the function to get a access token from Reddit
-Status authenticate( ScriptAccess* src, AccessData* acs );
+//Status authenticate( ScriptAccess* src, AccessData* acs ); -- deprecated
 
 #endif

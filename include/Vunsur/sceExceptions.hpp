@@ -25,5 +25,4 @@ struct FailedToExtractFromJsonData : public std::exception {
 	}
 };
 
-
 #endif
