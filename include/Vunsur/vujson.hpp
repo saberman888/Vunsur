@@ -6,7 +6,7 @@
 #include <typeinfo>
 
 template< class T > 
-T get_value( nlohmann::json src );
+T get_value( nlohmann::json p );
 
 #endif
 
