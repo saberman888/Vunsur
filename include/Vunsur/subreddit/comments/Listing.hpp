@@ -12,6 +12,9 @@ struct Listing {
 	std::string after;
 	//std::string modhash;
 	std::vector< T > children;
+	int size() { return children.size(); }
+	//void next();
+	//void previous();
 };
 
 #endif
