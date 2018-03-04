@@ -94,9 +94,7 @@ Status ScriptAccess::getMe()
 		// If the user is not logged in then set code to NULL
 		// set cstat to ERROR_NOT_LOGGED_IN and the message to
 		// a error messaged about not being logged in
-		me.code = NULL;
-		me.cstat = ERROR_NOT_LOGGED_IN;
-		me.message = "Error: Not logged in";
+		not_logged_in(me);
 		return me;
 	}
 }
@@ -126,9 +124,7 @@ Status ScriptAccess::getFriends(std::vector< BasicUser* > * f )
 		return get_friends( this->acd,  f);
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
@@ -146,9 +142,7 @@ Status ScriptAccess::getSubredditKarma( std::vector<SubredditKarma*> *sbv )
 		return get_karma( this->acd, sbv );
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 	
@@ -161,9 +155,7 @@ Status ScriptAccess::getTrophies( std::vector< Trophy* > *trophies ) {
 		return get_trophies(this->acd, trophies);
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
@@ -174,9 +166,7 @@ Status ScriptAccess::getPrefs(UserPrefs* up) {
 		return get_prefs(this->acd, up);
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
@@ -217,9 +207,7 @@ Status ScriptAccess::getMessagingPrefs() {
 		throw FunctionUnavailable();
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
@@ -229,9 +217,7 @@ Status ScriptAccess::giveGold( std::string username ) {
 		return give_gold(this->acd, username);
 	} else {
 		Status s;
-		s.code = NULL;
-		s.cstat = ERROR_NOT_LOGGED_IN;
-		s.message = "Error: Not logged in";
+		not_logged_in(s);
 		return s;
 	}
 }
@@ -363,14 +349,10 @@ Status ScriptAccess::authenticate()
 			curl_easy_setopt( handle, CURLOPT_URL, "https://www.reddit.com/api/v1/access_token" );
 			curl_easy_setopt( handle, CURLOPT_POST, 1L );
 			
-			println(0)
-			//std::string params = this->generate_scriptparams();
-			#ifdef DEBUG
-			//std::cout << params << std::endl;
-			#endif
-			
+			println(0);
 			// These params will hold the username, password and permissions
 			std::string params = this->bind_params();
+			
 			// and if the loggedin is true then append the user's
 			// username and password to the params
 			std::string userpwd;
