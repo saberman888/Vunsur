@@ -41,29 +41,24 @@ OAUTH::OAUTH()
 std::string OAUTH::generate_permissions()
 {
 	int psize = this->permissions.size();
-	if( psize != 0 ) {
-	
-		Permission first = this->permissions[0];
-		if( psize == 1 && first == all )
+	if( psize == 0 )
+	{
+		return this->generate_all_permissions();
+	} else {
+		std::string returnString = "";
+		for( int i = 0; i < this->permissions.size(); i++ )
 		{
-			return this->generate_all_permissions();
-		} else {
-			std::string returnString = "";
-			for( int i = 0; i < this->permissions.size(); i++ )
-			{
-				Permission p = this->permissions[i];
-				int pIndex = p;
-				std::string pString = this->permission_string_list[pIndex];
-				
-				returnString += pString;
-				
-				if( i != psize )
-					returnString += "%20";
-			}
-			return returnString;
+			Permission p = this->permissions[i];
+			int pIndex = p;
+			std::string pString = this->permission_string_list[pIndex];
+			
+			returnString += pString;
+			
+			if( i != psize )
+				returnString += "%20";
 		}
+		return returnString;
 	}
-	return "";
 }
 
 std::string OAUTH::generate_all_permissions()
