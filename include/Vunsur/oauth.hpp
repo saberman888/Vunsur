@@ -15,8 +15,7 @@
 
 typedef enum e_permissions
 {
-	all = 0,
-	account,
+	account = 0
 	creddits,
 	edit,
 	flair,
