@@ -142,7 +142,7 @@ Status get_user_trophies(AccessData* acd, std::string username) {
 	}
 }
 
-Status get_about_saved( AccessData* dat, std::string username )
+Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *usl  )
 {
 	Status s;
 	CURL* handle;
@@ -170,7 +170,7 @@ Status get_about_saved( AccessData* dat, std::string username )
 			
 			std::string url = "https://oauth.reddit.com/user/";
 			url += username;
-			url += "/saved?limit=25";
+			url += "/saved?limit=3";
 			
 			
 			curl_easy_setopt( handle, CURLOPT_URL, url.c_str() );
@@ -203,15 +203,65 @@ Status get_about_saved( AccessData* dat, std::string username )
 				out << json;
 				#endif
 				
-				/*nlohmann::json j = nlohmann::json::parse(json);
+				nlohmann::json saveddata = nlohmann::json::parse(json.c_str());
+				nlohmann::json root;
 				try {
-					std::string message = j.at("message");
-				} catch ( nlohmann::json::out_of_range& e ) {
+					root = saveddata.at("data");
+				} catch( nlohmann::json::out_of_range& e ) {
+					// if the root tag, "data" isn't present then check if there's an error message
+#ifdef DEBUG
+					std::cout << e.what() << std::endl;
+#endif
+
+					std::string message = root.at("message");
+					api_error(s, state, message); return s;
+				}
+				
+				// Get before and after
+				std::string before = get_string_value( root.at("before") );
+				std::string after = get_string_value( root.at("after") );
+				
+				std::cout << "Before: " << before << std::endl;
+				std::cout << "After: " << after << std::endl;
+				
+				nlohmann::json data = root.at("data");
+				
+				nlohmann::json children;
+				
+				try {
+					children = data.at("children");
+					if( children.is_array() && children.size() != 0) {
+					
+						for( auto& elem : children ) {
+							Blend *b = new(std::nothrow) Blend;
+							if( !b ) {
+								bad_alloc_error(s); return s;
+							}
+							
+							// Get the kind and set it's enum to b's kind variable
+							std::string strkind = get_string_value( elem.at("kind") );
+							if(strkind == "t1")
+								b->kind = Comment;
+							if(strkind == "t3")
+								b->kind = Account;
+								
+								
+							if( b->kind == Comment ) {
+								b->object.c.convert_json_to_comment(elem);
+								usl->children.push_back(b);
+							} else if( b->kind == Link ) {
+								// TODO
+							}
+						}
+					}
+					
+				} catch( nlohmann::json::out_of_range& e ) {
 					#ifdef DEBUG
 					std::cerr << e.what() << std::endl;
 					#endif
-					api_error(s,state,"Unknown error"); return s;
-				}*/
+					
+					array_error(s); return s;
+				}
 				
 				s.cstat = ERROR_NONE;
 				s.message = "";
