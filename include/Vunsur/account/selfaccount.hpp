@@ -13,6 +13,7 @@
 #include "condition.hpp"
 #include "Info.hpp"
 #include "Error.hpp"
+#include "vujson.hpp"
 
 #include "UserAccount.hpp"
 #include "BasicUser.hpp"
