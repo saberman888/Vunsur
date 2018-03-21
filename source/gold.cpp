@@ -10,8 +10,8 @@ Status gild( AccessData* dat, std::string fullname )
 	handle = curl_easy_init();
 	
 	if( handle ) {
-		CURLcode result = curl_global_init(CURL_GLOBAL_SSL);
-		if( result != CURLE_OK ) {
+		CURLcode gresult = curl_global_init(CURL_GLOBAL_SSL);
+		if( gresult != CURLE_OK ) {
 			set_curl_global_error(s); return s;
 		} else {
 			
