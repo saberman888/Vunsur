@@ -30,6 +30,13 @@ class UserAccount : public Created, public BaseThing {
 		bool adzerk_reporting_2;
 		
 		bool chat;
+		bool chat_group_rollout;
+		bool chat_menu_notification;
+		bool chat_rollout;
+		
+		bool crossposting_ga;
+		bool crossposting_recent;
+
 		Holdout* default_srs_holdout;
 		
 		bool do_not_track;
@@ -70,6 +77,7 @@ class UserAccount : public Created, public BaseThing {
 		bool post_embed;
 		bool post_to_profile_beta;
 		bool programmatic_ads;
+		Holdout* removed_consumed_holdout;
 		bool screenview_events;
 		bool scroll_events;
 		bool search_dark_traffic;
