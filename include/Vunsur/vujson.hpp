@@ -2,11 +2,13 @@
 #define VUJSON_HPP
 
 #include "json.hpp"
-
 #include <typeinfo>
+#include <string>
 
-template< class T > 
-T get_value( nlohmann::json p );
+bool get_boolean_value(nlohmann::json src);
+long get_long_value(nlohmann::json src);
+int get_integer_value(nlohmann::json src);
+std::string get_string_value(nlohmann::json src);
 
 #endif
 
