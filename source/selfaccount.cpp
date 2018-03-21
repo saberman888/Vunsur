@@ -38,6 +38,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 			result = curl_easy_perform( handle );
 			curl_easy_cleanup(handle);
 			curl_global_cleanup();
+			curl_slist_free_all(header);
 			
 			curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &status_code);
 			
@@ -57,12 +58,12 @@ Status get_self(AccessData* dat, UserAccount* usr){
 				out << returndata;
 				#endif
 				
-				auto js = nlohmann::json::parse(returndata);
+				nlohmann::json js = nlohmann::json::parse(returndata.c_str());
 				
 				try {
-					usr->comment_karma = js.at("comment_karma");
-					usr->created = js.at("created");
-					usr->created_utc = js.at("created_utc");
+					usr->comment_karma = get_integer_value(js.at("comment_karma"));
+					usr->created = get_long_value(js.at("created"));
+					usr->created_utc = get_long_value(js.at("created_utc"));
 					usr->kind = Account;
 					
 					// begin features
@@ -77,25 +78,26 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						json_error(st, "Error: features does not exist"); return st;
 					}
 					
-					usr->activity_service_read = j.at("activity_service_read");
-					usr->activity_service_write = j.at("activity_service_write");
-					usr->adblock_test = j.at("adblock_test");
-					usr->ads_auction = j.at("ads_auction");
-					usr->ads_auto_extend = j.at("ads_auto_extend");
-					usr->ads_auto_refund = j.at("ads_auto_refund");
-					usr->adserver_reporting = j.at("adserver_reporting");
-					usr->adzerk_do_not_track = j.at("adzerk_do_not_track");
-					usr->adzerk_reporting_2 = j.at("adzerk_reporting_2");
+					usr->activity_service_read = get_boolean_value(j.at("activity_service_read"));
+					usr->activity_service_write = get_boolean_value(j.at("activity_service_write"));
+					usr->adblock_test = get_boolean_value(j.at("adblock_test"));
+					usr->ads_auction = get_boolean_value(j.at("ads_auction"));
+					usr->ads_auto_extend = get_boolean_value(j.at("ads_auto_extend"));
+					usr->ads_auto_refund = get_boolean_value(j.at("ads_auto_refund"));
+					usr->adserver_reporting = get_boolean_value(j.at("adserver_reporting"));
+					usr->adzerk_do_not_track = get_boolean_value(j.at("adzerk_do_not_track"));
+					usr->adzerk_reporting_2 = get_boolean_value(j.at("adzerk_reporting_2"));
 					
-					usr->chat = j.at("chat");
+					usr->chat = get_boolean_value(j.at("chat"));
+					usr->chat_group_rollout = get_boolean_value(j.at("chat_group_rollout"));
+					usr->chat_menu_notification = get_boolean_value(j.at("chat_menu_notification"));
+					usr->chat_rollout = get_boolean_value(j.at("chat_rollout"));
+
+					usr->crossposting_ga = get_boolean_value(j.at("crossposing_ga"));
+					usr->crossposting_recent = get_boolean_value(j.at("crossposing_recent"));
 					
 					nlohmann::json dsh;
 					usr->default_srs_holdout = new (std::nothrow) Holdout;
-					
-					if( !usr->default_srs_holdout ) {
-						bad_alloc_error(st);
-						return st;
-					}
 					
 					try {
 						dsh = j.at("default_srs_holdout");
@@ -104,26 +106,22 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->default_srs_holdout;
 						json_error(st, "Error: default_srs_holdout does not exist");
 						return st;
 					}
 					
-					usr->default_srs_holdout->experiment_id = dsh.at("experiment_id");
-					usr->default_srs_holdout->owner = dsh.at("owner");
-					usr->default_srs_holdout->variant = dsh.at("variant");
+					usr->default_srs_holdout->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->default_srs_holdout->owner = get_string_value(dsh.at("owner"));
+					usr->default_srs_holdout->variant = get_string_value(dsh.at("variant"));
 					
-					usr->do_not_track = j.at("do_not_track");
-					usr->eu_cookie_policy = j.at("eu_cookie_policy");
-					usr->expando_events = j.at("expando_events");
-					usr->force_https = j.at("force_https");
-					usr->geopopular = j.at("geopopular");
+					usr->do_not_track = get_boolean_value(j.at("do_not_track"));
+					usr->eu_cookie_policy = get_boolean_value(j.at("eu_cookie_policy"));
+					usr->expando_events = get_boolean_value(j.at("expando_events"));
+					usr->force_https = get_boolean_value(j.at("force_https"));
+					usr->geopopular = get_boolean_value(j.at("geopopular"));
 					
-					usr->geopopular_gb_holdout = new (std::nothrow) Holdout;
-					if(!usr->geopopular_gb_holdout) {
-						bad_alloc_error(st); return st;
-					}
-					
+					usr->geopopular_gb_holdout = new Holdout;
+		
 					try {
 						dsh = j.at("geopopular_gb_holdout");
 						
@@ -132,122 +130,121 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->geopopular_gb_holdout;
 						json_error(st, "Error: geopopular_gb_holdout does not exist"); return st;
 					}
 					
-					usr->geopopular_gb_holdout->experiment_id = dsh.at("experiment_id");
-					usr->geopopular_gb_holdout->owner = dsh.at("owner");
-					usr->geopopular_gb_holdout->variant = dsh.at("variant");
+					usr->geopopular_gb_holdout->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->geopopular_gb_holdout->owner = get_string_value(dsh.at("owner"));
+					usr->geopopular_gb_holdout->variant = get_string_value(dsh.at("variant"));
 					
-					usr->geopopular_ie_holdout = new (std::nothrow) Holdout;
-					if( !usr->geopopular_ie_holdout ) {
-						bad_alloc_error(st); return st;
-					}
+					usr->geopopular_ie_holdout = new Holdout;
+
 					try {
 						dsh = j.at("geopopular_ie_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->geopopular_ie_holdout;
 						json_error(st, "Error: geopopular_ie_holdout does not exist"); return st;
 					}
 					
-					usr->geopopular_ie_holdout->experiment_id = dsh.at("experiment_id");
-					usr->geopopular_ie_holdout->owner = dsh.at("owner");
-					usr->geopopular_ie_holdout->variant = dsh.at("variant");
+					usr->geopopular_ie_holdout->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->geopopular_ie_holdout->owner = get_string_value(dsh.at("owner"));
+					usr->geopopular_ie_holdout->variant = get_string_value(dsh.at("variant"));
 					
-					usr->geopopular_in_holdout = new (std::nothrow) Holdout;
-					if( !usr->geopopular_in_holdout ) {
-						bad_alloc_error(st); return st;
-					}
+					usr->geopopular_in_holdout = new Holdout;
+
 					try {
 						dsh = j.at("geopopular_in_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->geopopular_in_holdout;
 						json_error(st, "Error: geopopular_in_holdout does not exist"); return st;
 					}
 					
-					usr->geopopular_in_holdout->experiment_id = dsh.at("experiment_id");
-					usr->geopopular_in_holdout->owner = dsh.at("owner");
-					usr->geopopular_in_holdout->variant = dsh.at("variant");
+					usr->geopopular_in_holdout->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->geopopular_in_holdout->owner = get_string_value(dsh.at("owner"));
+					usr->geopopular_in_holdout->variant = get_string_value(dsh.at("variant"));
 					
 					nlohmann::json geopop_tw;
-					usr->geopopular_tw_holdout = new (std::nothrow) Holdout;
-					if( !usr->geopopular_tw_holdout ) {
-						bad_alloc_error(st);
-						return st;
-					}
+					usr->geopopular_tw_holdout = new Holdout;
+
 					try {
 						geopop_tw = j.at("geopopular_tw_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->geopopular_tw_holdout;
 						json_error(st, "Error: geopopular_tw_holdout does not exist"); return st;
 					}
 					
-					usr->geopopular_tw_holdout->experiment_id = geopop_tw.at("experiment_id");
-					usr->geopopular_tw_holdout->owner = geopop_tw.at("owner");
-					usr->geopopular_tw_holdout->variant = geopop_tw.at("variant");
+					usr->geopopular_tw_holdout->experiment_id = get_integer_value(geopop_tw.at("experiment_id"));
+					usr->geopopular_tw_holdout->owner = get_string_value(geopop_tw.at("owner"));
+					usr->geopopular_tw_holdout->variant = get_string_value(geopop_tw.at("variant"));
 
 					
-					usr->give_hsts_grants = j.at("give_hsts_grants");
-					usr->https_redirect = j.at("https_redirect");
-					usr->inbox_count = js.at("inbox_count");
-					usr->interest_targeting = j.at("interest_targeting");
-					usr->legacy_search_pref = j.at("legacy_search_pref");
-					usr->listing_service_rampup = j.at("listing_service_rampup");
-					usr->live_happening_now = j.at("live_happening_now");
-					usr->live_orangereds = j.at("live_orangereds");
-					usr->loadtest_sendbird_me = j.at("loadtest_sendbird_me");
-					usr->moat_tracking = j.at("moat_tracking");
-					usr->mobile_native_banner = j.at("mobile_native_banner");
-					usr->mobile_web_targeting = j.at("mobile_web_targeting");
+					usr->give_hsts_grants = get_boolean_value(j.at("give_hsts_grants"));
+					usr->https_redirect = get_boolean_value(j.at("https_redirect"));
+					usr->inbox_count = get_boolean_value(js.at("inbox_count"));
+					usr->interest_targeting = get_boolean_value(j.at("interest_targeting"));
+					usr->legacy_search_pref = get_boolean_value(j.at("legacy_search_pref"));
+					usr->listing_service_rampup = get_boolean_value(j.at("listing_service_rampup"));
+					usr->live_happening_now = get_boolean_value(j.at("live_happening_now"));
+					usr->live_orangereds = get_boolean_value(j.at("live_orangereds"));
+					usr->loadtest_sendbird_me = get_boolean_value(j.at("loadtest_sendbird_me"));
+					usr->moat_tracking = get_boolean_value(j.at("moat_tracking"));
+					usr->mobile_native_banner = get_boolean_value(j.at("mobile_native_banner"));
+					usr->mobile_web_targeting = get_boolean_value(j.at("mobile_web_targeting"));
 					
-					usr->mweb_xpromo_ad_feed_ios = new (std::nothrow) Holdout;
-					if( !usr->mweb_xpromo_ad_feed_ios ) {
-						bad_alloc_error(st);
-						return st;
-					}
+					usr->mweb_xpromo_ad_feed_ios = Holdout;
 					try {
 						dsh = j.at("mweb_xpromo_ad_feed_ios");
 					} catch ( nlohmann::json::out_of_range& e ) {
 						#ifdef DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->mweb_xpromo_ad_feed_ios;
 						json_error(st, "Error: mweb_xpromo_ad_feed_ios does not exist"); return st;
 					}
 					
-					usr->mweb_xpromo_ad_feed_ios->experiment_id = dsh.at("experiment_id");
-					usr->mweb_xpromo_ad_feed_ios->owner = dsh.at("owner");
-					usr->mweb_xpromo_ad_feed_ios->variant = dsh.at("variant");
+					usr->mweb_xpromo_ad_feed_ios->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->mweb_xpromo_ad_feed_ios->owner = get_string_value(dsh.at("owner"));
+					usr->mweb_xpromo_ad_feed_ios->variant = get_string_value(dsh.at("variant"));
 					
-					usr->mweb_xpromo_interstitial_comments_android = j.at("mweb_xpromo_interstitial_comments_android");
-					usr->mweb_xpromo_interstitial_comments_ios = j.at("mweb_xpromo_interstitial_comments_ios");
+					usr->mweb_xpromo_interstitial_comments_android = get_boolean_value(j.at("mweb_xpromo_interstitial_comments_android"));
+					usr->mweb_xpromo_interstitial_comments_ios = get_boolean_value(j.at("mweb_xpromo_interstitial_comments_ios"));
 					
-					usr->mweb_xpromo_modal_listing_click_daily_dismissible_android = j.at("mweb_xpromo_modal_listing_click_daily_dismissible_android");
-					usr->mweb_xpromo_modal_listing_click_daily_dismissible_ios = j.at("mweb_xpromo_modal_listing_click_daily_dismissible_ios");
+					usr->mweb_xpromo_modal_listing_click_daily_dismissible_android = get_boolean_value(j.at("mweb_xpromo_modal_listing_click_daily_dismissible_android"));
+					usr->mweb_xpromo_modal_listing_click_daily_dismissible_ios = get_boolean_value(j.at("mweb_xpromo_modal_listing_click_daily_dismissible_ios"));
 					
-					usr->new_loggedin_cache_policy = j.at("new_loggedin_cache_policy");
-					usr->new_overview = j.at("new_overview");
-					usr->new_report_dialog = j.at("new_report_dialog");
-					usr->new_report_flow = j.at("new_report_flow");
-					usr->orangereds_as_emails = j.at("orangereds_as_emails");
-					usr->outbound_clicktracking = j.at("outbound_clicktracking");
-					usr->pause_ads = j.at("pause_ads");
-					usr->personalization_prefs = j.at("personalization_prefs");
-					usr->post_embed = j.at("post_embed");
-					usr->post_to_profile_beta = j.at("post_to_profile_beta");
-					usr->programmatic_ads = j.at("programmatic_ads");
-					usr->screenview_events = j.at("screenview_events");
-					usr->scroll_events = j.at("scroll_events");
+					usr->new_loggedin_cache_policy = get_boolean_value(j.at("new_loggedin_cache_policy"));
+					usr->new_overview = get_boolean_value(j.at("new_overview"));
+					usr->new_report_dialog = get_boolean_value(j.at("new_report_dialog"));
+					usr->new_report_flow = get_boolean_value(j.at("new_report_flow"));
+					usr->orangereds_as_emails = get_boolean_value(j.at("orangereds_as_emails"));
+					usr->outbound_clicktracking = get_boolean_value(j.at("outbound_clicktracking"));
+					usr->pause_ads = get_boolean_value(j.at("pause_ads"));
+					usr->personalization_prefs = get_boolean_value(j.at("personalization_prefs"));
+					usr->post_embed = get_boolean_value(j.at("post_embed"));
+					usr->post_to_profile_beta = get_boolean_value(j.at("post_to_profile_beta"));
+					usr->programmatic_ads = get_boolean_value(j.at("programmatic_ads"));
+
+					usr->removed_consumed_holdout = new Holdout;
+					try {
+						dsh = j.at("removed_consumed_holdout");
+					}
+					catch (nlohmann::json::out_of_range& e) {
+#ifdef DEBUG
+						std::cerr << e.what() << std::endl;
+#endif
+						json_error(st, "Error: removed_consimed_holdout does not exist"); return st;
+					}
+					usr->removed_consumed_holdout->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->removed_consumed_holdout->owner = get_string_value(dsh.at("owner"));
+					usr->removed_consumed_holdout->variant = get_string_value(dsh.at("variant"));
+
+					usr->screenview_events = get_boolean_value(j.at("screenview_events"));
+					usr->scroll_events = get_boolean_value(j.at("scroll_events"));
 					usr->search_dark_traffic = j.at("search_dark_traffic");
 					
 					usr->search_public_traffic = new (std::nothrow) Holdout;
@@ -300,7 +297,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->has_subscribed = js.at("has_subscribed");
 					usr->has_verified_email = js.at("has_verified_email");
 					usr->hide_from_robots = js.at("hide_from_robots");
-					usr->id = js.at("id");
+					usr->id = js.at("id").get<std::string>();
 					usr->in_beta = js.at("in_beta");
 					usr->inbox_count = js.at("inbox_count");
 					usr->is_employee = js.at("is_employee");
@@ -513,7 +510,7 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv ){
 				out << jsondata;
 				#endif
 				
-				auto j = nlohmann::json::parse(jsondata);
+				auto j = nlohmann::json::parse(jsondata.c_str());
 				
 				try {
 					auto data_arr = j.at("data");
@@ -761,7 +758,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 				}
 				
 				
-				auto j = nlohmann::json::parse(jsondat);
+				auto j = nlohmann::json::parse(jsondat.c_str());
 		
 				try {
 				
@@ -903,7 +900,7 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 					return s;
 				}
 				
-				auto j = nlohmann::json::parse(json);
+				auto j = nlohmann::json::parse(json.c_str());
 				try {
 					auto data = j.at("data");
 					auto trophies = data.at("trophies");
@@ -1059,7 +1056,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				out << json;
 				#endif
 				
-				auto j = nlohmann::json::parse(json);
+				auto j = nlohmann::json::parse(json.c_str());
 				
 				try {
 					
@@ -1319,7 +1316,7 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 				//std::ofstream out("blocked_prefs.json");
 				//out << json;
 				
-				auto j = nlohmann::json::parse(json);
+				auto j = nlohmann::json::parse(json.c_str());
 				
 				try {
 					auto data = j.at("data");
@@ -1445,7 +1442,7 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 				out << json;
 				#endif
 				
-				auto j = nlohmann::json::parse(json);
+				auto j = nlohmann::json::parse(json.c_str());
 				
 				try {
 					auto data = j.at("data");
