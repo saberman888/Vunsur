@@ -142,7 +142,7 @@ Status get_user_trophies(AccessData* acd, std::string username) {
 	}
 }
 
-Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *usl  )
+Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *usl, int limit)
 {
 	Status s;
 	CURL* handle;
@@ -170,7 +170,11 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 			
 			std::string url = "https://oauth.reddit.com/user/";
 			url += username;
-			url += "/saved?limit=3";
+			url += "/saved";
+			if (limit != 0) {
+				url += "?limit=";
+				url += integer_to_string(limit);
+			}
 			
 			
 			curl_easy_setopt( handle, CURLOPT_URL, url.c_str() );
@@ -209,7 +213,7 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 					root = saveddata.at("data");
 				} catch( nlohmann::json::out_of_range& e ) {
 					// if the root tag, "data" isn't present then check if there's an error message
-#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
+#ifdef DEBUG || _DEBUG 
 					std::cout << e.what() << std::endl;
 #endif
 
@@ -255,7 +259,7 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 					}
 					
 				} catch( nlohmann::json::out_of_range& e ) {
-					#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
+					#ifdef DEBUG || _DEBUG 
 					std::cerr << e.what() << std::endl;
 					#endif
 					

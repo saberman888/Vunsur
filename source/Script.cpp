@@ -288,11 +288,26 @@ Status ScriptAccess::getUserSaved( std::string username, Listing<Blend*> *usl )
 	Status s;
 	if( this->isLoggedIn() )
 	{
-		return get_about_saved(this->acd, username, usl);
+		return get_about_saved(this->acd, username, usl, 0);
 	} else {
 		not_logged_in(s);
 		return s;
 	}
+}
+
+Status ScriptAccess::getUserSaved(std::string username, Listing<Blend*>* usl, int limit)
+{
+	Status m;
+	if (this->isLoggedIn())
+	{
+		return get_about_saved(this->acd, username, usl, limit);
+	}
+	else
+	{
+		
+		not_logged_in(m);
+	}
+	return m
 }
 
 Status ScriptAccess::deleteComment(std::string fullname)

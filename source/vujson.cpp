@@ -36,6 +36,14 @@ int get_integer_value(nlohmann::json src)
 		return NULL;
 }
 
+template<class T>
+inline std::string integer_to_string(T val)
+{
+	ostringstream conv;
+	conv << val;
+	return conv.str();
+}
+
 std::string get_string_value(nlohmann::json src)
 {
 	if (!src.is_null() && src.is_string())
