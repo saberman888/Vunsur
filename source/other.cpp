@@ -48,7 +48,7 @@ Status scopes( AccessData* dat )
 				set_curl_strerror(s,result);
 				return s;
 			} else {
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				

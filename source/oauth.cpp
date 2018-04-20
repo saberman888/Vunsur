@@ -40,13 +40,13 @@ OAUTH::OAUTH()
 
 std::string OAUTH::generate_permissions()
 {
-	int psize = this->permissions.size();
+	size_t psize = this->permissions.size();
 	if( psize == 0 )
 	{
 		return this->generate_all_permissions();
 	} else {
 		std::string returnString = "";
-		for( int i = 0; i < this->permissions.size(); i++ )
+		for( size_t i = 0; i < this->permissions.size(); i++ )
 		{
 			Permission p = this->permissions[i];
 			int pIndex = p;
@@ -64,7 +64,7 @@ std::string OAUTH::generate_permissions()
 std::string OAUTH::generate_all_permissions()
 {
 	std::string bscope = "scope=";
-	for( int i = 0; i < this->permission_string_list.size(); i++ )
+	for( size_t i = 0; i < this->permission_string_list.size(); i++ )
 	{
 		std::string elem = this->permission_string_list[i];
 		bscope += elem;

@@ -18,7 +18,7 @@ Status gild( AccessData* dat, std::string fullname )
 			std::string url = "https://oauth.reddit.com/api/v1/gild/";
 			url += fullname;
 			
-			struct curl_slist* header;
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
 			authhead += " ";
@@ -32,7 +32,7 @@ Status gild( AccessData* dat, std::string fullname )
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -78,7 +78,7 @@ Status give_gold( AccessData* dat, std::string username )
 			std::string url = "https://oauth.reddit.com/api/v1/gold/give/";
 			url += username;
 			
-			struct curl_slist* header;
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
 			authhead += " ";
@@ -92,7 +92,7 @@ Status give_gold( AccessData* dat, std::string username )
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			

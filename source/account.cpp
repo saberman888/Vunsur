@@ -28,7 +28,7 @@ Status get_self(AccessData* dat, std::string userAgent, Self * person)
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L  );
 			curl_easy_setopt( handle, CURLOPT_USERAGENT, userAgent.c_str() );
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -43,7 +43,7 @@ Status get_self(AccessData* dat, std::string userAgent, Self * person)
 			
 			if( result != CURLE_OK )
 			{
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cerr << "curl_easy_strerror(): " << curl_easy_strerror(result) << std::endl;
 				#endif
 				
@@ -76,11 +76,11 @@ Status get_self(AccessData* dat, std::string userAgent, Self * person)
 				bool is_employee;
 				bool is_sponsor;
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << returndata << std::endl;
 				#endif
 				
-				auto j = nlohmann::json::parse(returndata);
+				auto j = nlohmann::json::parse(returndata.c_str());
 
 				
 				try {
@@ -133,14 +133,14 @@ Status get_self(AccessData* dat, std::string userAgent, Self * person)
 				person->inbox_count = inbox_count;
 				person->LinkKarma = link_karma;
 				// Modhash conversion
-				if(modhash != "0")
+				/*if(modhash != "0")
 				{
 					char* cmodhash;
 					std::strcpy(cmodhash, modhash.c_str());
 					person->modhash = cmodhash;
 				} else {
 					person->modhash = nullptr;
-				}
+				}*/
 				//end
 				person->name = name;
 				person->user_id = id;
@@ -168,7 +168,7 @@ Status get_self(AccessData* dat, std::string userAgent, Self * person)
 				return st;
 			}
 		} else {
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			std::cerr << "Error: Failed to initialize CURL GLOBAL" << std::endl;
 			#endif
 			
@@ -179,7 +179,7 @@ Status get_self(AccessData* dat, std::string userAgent, Self * person)
 			return st;
 		}
 	} else {
-		#ifdef DEBUG
+		#ifdef DEBUG || _DEBUG
 		std::cerr << "Error: Failed to initialize CURL * handle " << std::endl;
 		#endif
 		
@@ -219,7 +219,7 @@ void get_blocked_users(AccessData* dat, std::string userAgent)
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &jsondat );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -234,7 +234,7 @@ void get_blocked_users(AccessData* dat, std::string userAgent)
 				std::ofstream out("blocked.json");
 				out << jsondat;
 				
-				auto j = nlohmann::json::parse(jsondat);
+				auto j = nlohmann::json::parse(jsondat.c_str());
 				
 				
 				// Error
@@ -287,7 +287,7 @@ std::vector< Friend* > get_friends(AccessData* dat, std::string userAgent)
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &jsondat );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -295,7 +295,7 @@ std::vector< Friend* > get_friends(AccessData* dat, std::string userAgent)
 			curl_easy_cleanup( handle );
 			curl_global_cleanup();
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			std::cout << jsondat << std::endl;
 			#endif
 			
@@ -304,7 +304,7 @@ std::vector< Friend* > get_friends(AccessData* dat, std::string userAgent)
 				std::cerr << "curl_easy_strerror(): " << curl_easy_strerror(result) << std::endl;
 				return collectedFriends;
 			} else {
-				auto j = nlohmann::json::parse(jsondat);
+				auto j = nlohmann::json::parse(jsondat.c_str());
 				
 				auto d = j.at("data");
 				auto children = d.at("children");
@@ -319,7 +319,7 @@ std::vector< Friend* > get_friends(AccessData* dat, std::string userAgent)
 							return collectedFriends;
 						}
 						std::cout << it.key << std::endl;
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << name << std::endl;
 						#endif
 						//f->name = name;

@@ -38,7 +38,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -311,7 +311,7 @@ Status subreddit_about( AccessData* acd, std::string subreddit, SubredditInfo* s
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						
@@ -374,7 +374,7 @@ Status subreddit_about_edit( AccessData* acd, std::string subreddit )
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -402,14 +402,14 @@ Status subreddit_about_edit( AccessData* acd, std::string subreddit )
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						std::string message = j.at("message");
 						api_error(s,state,message);
 						return s;
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						

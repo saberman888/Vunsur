@@ -283,12 +283,12 @@ Status ScriptAccess::getSubredditSetting(std::string subreddit)
 	}
 }
 
-Status ScriptAccess::getUserSaved( std::string username )
+Status ScriptAccess::getUserSaved( std::string username, Listing<Blend*> *usl )
 {
 	Status s;
 	if( this->isLoggedIn() )
 	{
-		return get_about_saved(this->acd, username);
+		return get_about_saved(this->acd, username, usl);
 	} else {
 		not_logged_in(s);
 		return s;
@@ -333,7 +333,7 @@ Status ScriptAccess::authenticate()
 	// collected from the POST request
 	std::string returndata;
 	// Status code for the operation
-	int status_code;
+	long status_code = 0;
 	// Needed status variable
 	Status s;
 	// If handle initializes successfully then proceed
@@ -373,13 +373,13 @@ Status ScriptAccess::authenticate()
 			// Set SSL_VERIFYPEER to 0L
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			
-			// If DEBUG is defined set CURLOPT_VERBOSE to 1L
-			#ifdef DEBUG
+			// If DEBUG || _DEBUG is defined set CURLOPT_VERBOSE to 1L
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
 			// write functions
-			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat);
+			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &write_to_string);
 			// Assign returndata to be the string holding the json data
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &returndata);
 			
@@ -389,33 +389,36 @@ Status ScriptAccess::authenticate()
 			curl_easy_cleanup( handle );
 			curl_global_cleanup();
 			
-			// Get the status code of the operation and assign it to status_code
-			curl_easy_getinfo( handle, CURLINFO_RESPONSE_CODE, &status_code);
 			
 			if( result != CURLE_OK )
 			{
+				println("CURL NOT OK");
+				// Get response code
+				curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status_code);
 				// If handle's operation failed then print out the curl error message
-				// if DEBUG is defined and set the status accordingly
-				#ifdef DEBUG
+				// if DEBUG || _DEBUG is defined and set the status accordingly
+				#ifdef DEBUG || _DEBUG
 				std::cerr << "curl_easy_strerror(): " << curl_easy_strerror(result) << std::endl;
 				#endif
-				s.code = status_code ;
+				s.code = static_cast<int>(status_code);
 				s.cstat = ERROR_CURL_STRERROR;
 				s.message = curl_easy_strerror( result );
 				
 				return s;
 				
 			} else {
-				
+				println("CURL OK");
+				// Get response code 
+				curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status_code);
 				// If everything succeeds then proceed to extract the json
 				
-				// If DEBUG is available then print out the json data
-				#ifdef DEBUG
+				// If DEBUG || _DEBUG is available then print out the json data
+				#ifdef DEBUG || _DEBUG
 				std::cout << returndata << std::endl;
 				#endif
-				
+				println(returndata.size());
 				// Parse the json
-				auto j = nlohmann::json::parse(returndata);
+				nlohmann::json j = nlohmann::json::parse(returndata);
 				// declare the necessary variables
 				std::string acctoken;
 				std::string scope;
@@ -436,12 +439,12 @@ Status ScriptAccess::authenticate()
 						// If extracting the values fails then try to extract error values
 						std::string error_msg = j.at("message");
 						int code = j.at("error");
-						// print error message if debug is defined
-						#ifdef DEBUG
+						// print error message if DEBUG || _DEBUG is defined
+						#ifdef DEBUG || _DEBUG
 						std::cerr << "Error: " << error_msg << ", code: " << code << std::endl;
 						#endif
 						// set status and return
-						s.code = status_code;
+						s.code = static_cast<int>(status_code);
 						s.cstat = ERROR_NONE;
 						s.message = error_msg;
 					
@@ -452,12 +455,12 @@ Status ScriptAccess::authenticate()
 							// If obtaining the error fails then maybe
 							// the error is an unsupported_grant_type
 							std::string error = j.at("error");
-							s.code = status_code;
+							s.code = static_cast<int>(status_code);
 							s.cstat = ERROR_NONE;
 							s.message = error;
 							if( error == "unsupported_grant_type" )
 							{
-								#ifdef DEBUG
+								#ifdef DEBUG || _DEBUG
 								std::cerr << "Error: Unsupported grant type " << std::endl;
 								#endif
 								
@@ -465,7 +468,7 @@ Status ScriptAccess::authenticate()
 							} else if( error == "invalid_grant" ) {
 								
 								// If it isn't unsupported grant_type then it is probably a invalid grant
-								#ifdef DEBUG
+								#ifdef DEBUG || _DEBUG
 								std::cerr << "Error: Invalid grant" << std::endl;
 								#endif
 								
@@ -513,7 +516,7 @@ Status ScriptAccess::authenticate()
 				//this->acd->expire = now;
 				this->loggedin = true;
 				// set status
-				s.code = status_code;
+				s.code = static_cast<int>(status_code);
 				s.cstat = ERROR_NONE;
 				s.message = "";
 				// and reeeeeeeeeeeeturn!
@@ -521,9 +524,9 @@ Status ScriptAccess::authenticate()
 				return s;
 			}
 		} else {
-			// If curl global fails then it will end up here, and if DEBUG is defined
+			// If curl global fails then it will end up here, and if DEBUG || _DEBUG is defined
 			// then it will print out this error message
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			std::cerr << "Error: Failed to initialize CURL GLOBAL " << std::endl;
 			#endif
 			// Since failure has occured clean up the handle and configure the status accordingly
@@ -537,8 +540,8 @@ Status ScriptAccess::authenticate()
 		
 	} else {
 		// If handle failed to initialize then print out
-		// a error message only if DEBUG preprocessor directive is defined
-		#ifdef DEBUG
+		// a error message only if DEBUG || _DEBUG preprocessor directive is defined
+		#ifdef DEBUG || _DEBUG
 		std::cerr << "Error: Failed to initialize CURL * handle " << std::endl;
 		#endif
 		// Configure the status variable. Since there isn't a server error

@@ -28,7 +28,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 			curl_easy_setopt( handle, CURLOPT_HTTPHEADER, header );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L  );
 			curl_easy_setopt( handle, CURLOPT_USERAGENT, dat->userAgent.c_str() );
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -49,7 +49,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 				return st;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << returndata << std::endl;
 				#endif
 				
@@ -71,7 +71,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					try {
 						j = js.at("features");
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						
@@ -103,7 +103,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						dsh = j.at("default_srs_holdout");
 						
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						json_error(st, "Error: default_srs_holdout does not exist");
@@ -127,7 +127,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						
 					} catch ( nlohmann::json::out_of_range& e ) {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						json_error(st, "Error: geopopular_gb_holdout does not exist"); return st;
@@ -142,7 +142,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					try {
 						dsh = j.at("geopopular_ie_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						json_error(st, "Error: geopopular_ie_holdout does not exist"); return st;
@@ -157,7 +157,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					try {
 						dsh = j.at("geopopular_in_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						json_error(st, "Error: geopopular_in_holdout does not exist"); return st;
@@ -173,7 +173,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					try {
 						geopop_tw = j.at("geopopular_tw_holdout");
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						json_error(st, "Error: geopopular_tw_holdout does not exist"); return st;
@@ -197,11 +197,11 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->mobile_native_banner = get_boolean_value(j.at("mobile_native_banner"));
 					usr->mobile_web_targeting = get_boolean_value(j.at("mobile_web_targeting"));
 					
-					usr->mweb_xpromo_ad_feed_ios = Holdout;
+					usr->mweb_xpromo_ad_feed_ios = new Holdout;
 					try {
 						dsh = j.at("mweb_xpromo_ad_feed_ios");
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						json_error(st, "Error: mweb_xpromo_ad_feed_ios does not exist"); return st;
@@ -234,7 +234,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						dsh = j.at("removed_consumed_holdout");
 					}
 					catch (nlohmann::json::out_of_range& e) {
-#ifdef DEBUG
+#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 #endif
 						json_error(st, "Error: removed_consimed_holdout does not exist"); return st;
@@ -247,33 +247,28 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					usr->scroll_events = get_boolean_value(j.at("scroll_events"));
 					usr->search_dark_traffic = j.at("search_dark_traffic");
 					
-					usr->search_public_traffic = new (std::nothrow) Holdout;
-					if( !usr->search_public_traffic ) {
-						bad_alloc_error(st);
-						return st;
-					}
+					usr->search_public_traffic = new Holdout;
 					try {
 						dsh = j.at("search_public_traffic");
 						
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
-						delete usr->search_public_traffic;
 						json_error(st, "Error: search_public_traffic does not exist"); return st;
 					}
 					
-					usr->search_public_traffic->experiment_id = dsh.at("experiment_id");
-					usr->search_public_traffic->owner = dsh.at("owner");
-					usr->search_public_traffic->variant = dsh.at("variant");
+					usr->search_public_traffic->experiment_id = get_integer_value(dsh.at("experiment_id"));
+					usr->search_public_traffic->owner = get_string_value(dsh.at("owner"));
+					usr->search_public_traffic->variant = get_string_value(dsh.at("variant"));
 					
-					usr->show_amp_link = j.at("show_amp_link");
-					usr->show_recommended_link = j.at("show_recommended_link");
-					usr->show_user_sr_name = j.at("show_user_sr_name");
-					usr->subreddit_rules = j.at("subreddit_rules");
-					usr->upgrade_cookies = j.at("upgrade_cookies");
-					usr->users_listing = j.at("users_listing");
-					usr->whitelisted_pms = j.at("whitelisted_pms");
+					usr->show_amp_link = get_boolean_value(j.at("show_amp_link"));
+					usr->show_recommended_link = get_boolean_value(j.at("show_recommended_link"));
+					usr->show_user_sr_name = get_boolean_value(j.at("show_user_sr_name"));
+					usr->subreddit_rules = get_boolean_value(j.at("subreddit_rules"));
+					usr->upgrade_cookies = get_boolean_value(j.at("upgrade_cookies"));
+					usr->users_listing = get_boolean_value(j.at("users_listing"));
+					usr->whitelisted_pms = get_boolean_value(j.at("whitelisted_pms"));
 					// end features
 					
 					usr->gold_creddits = js.at("gold_creddits");
@@ -282,43 +277,43 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						if( js.at("gold_expiration").is_null() ) {
 							usr->gold_expiration = NULL;
 						} else {
-							usr->gold_expiration = js.at("gold_expiration");
+							usr->gold_expiration = get_long_value(js.at("gold_expiration"));
 						}
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						
 						json_error(st, "Error: gold_expirations does not exist"); return st;
 					}
 					
-					usr->has_mail = js.at("has_mail");
-					usr->has_mod_mail = js.at("has_mod_mail");
-					usr->has_subscribed = js.at("has_subscribed");
-					usr->has_verified_email = js.at("has_verified_email");
-					usr->hide_from_robots = js.at("hide_from_robots");
-					usr->id = js.at("id").get<std::string>();
-					usr->in_beta = js.at("in_beta");
-					usr->inbox_count = js.at("inbox_count");
-					usr->is_employee = js.at("is_employee");
-					usr->is_mod = js.at("is_mod");
-					usr->is_sponsor = js.at("is_sponsor");
-					usr->is_suspended = js.at("is_suspended");
-					usr->link_karma = js.at("link_karma");
-					usr->name = js.at("name");
-					usr->new_modmail_exists = js.at("new_modmail_exists");
-					usr->oauth_client_id = js.at("oauth_client_id");
-					usr->over_18 = js.at("over_18");
-					usr->pref_geopopular = js.at("pref_geopopular");
-					usr->pref_no_profanity = js.at("pref_no_profanity");
-					usr->pref_show_snoovatar = js.at("pref_show_snoovatar");
-					usr->pref_top_karma_subreddits = js.at("pref_top_karma_subreddits");
+					usr->has_mail = get_boolean_value(js.at("has_mail"));
+					usr->has_mod_mail = get_boolean_value(js.at("has_mod_mail"));
+					usr->has_subscribed = get_boolean_value(js.at("has_subscribed"));
+					usr->has_verified_email = get_boolean_value(js.at("has_verified_email"));
+					usr->hide_from_robots = get_boolean_value(js.at("hide_from_robots"));
+					usr->id = get_string_value(js.at("id"));
+					usr->in_beta = get_boolean_value(js.at("in_beta"));
+					usr->inbox_count = get_integer_value(js.at("inbox_count"));
+					usr->is_employee = get_boolean_value(js.at("is_employee"));
+					usr->is_mod = get_boolean_value(js.at("is_mod"));
+					usr->is_sponsor = get_boolean_value(js.at("is_sponsor"));
+					usr->is_suspended = get_boolean_value(js.at("is_suspended"));
+					usr->link_karma = get_integer_value(js.at("link_karma"));
+					usr->name = get_string_value(js.at("name"));
+					usr->new_modmail_exists = get_boolean_value(js.at("new_modmail_exists"));
+					usr->oauth_client_id = get_string_value(js.at("oauth_client_id"));
+					usr->over_18 = get_boolean_value(js.at("over_18"));
+					usr->pref_geopopular = get_string_value(js.at("pref_geopopular"));
+					usr->pref_no_profanity = get_boolean_value(js.at("pref_no_profanity"));
+					usr->pref_show_snoovatar = get_boolean_value(js.at("pref_show_snoovatar"));
+					usr->pref_top_karma_subreddits = get_boolean_value(js.at("pref_top_karma_subreddits"));
 					
 					nlohmann::json sub;
 					try {
 						sub = js.at("subreddit");
 					} catch( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						
@@ -330,13 +325,13 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						bad_alloc_error(st); return st;
 					}
 					
-					usr->subreddit->audience_target = sub.at("audience_target");
+					usr->subreddit->audience_target = get_string_value(sub.at("audience_target"));
 					
 					nlohmann::json bi = sub.at("banner_img");
 					if( bi.is_null() ) {
 						usr->subreddit->banner_img = "";
 					} else {
-						usr->subreddit->banner_img = sub.at("banner_img");
+						usr->subreddit->banner_img = get_string_value(sub.at("banner_img"));
 					}
 					
 					dsh = sub.at("banner_size");
@@ -348,12 +343,12 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						usr->subreddit->banner_size.push_back(0);
 						usr->subreddit->banner_size.push_back(0);
 					}
-					usr->subreddit->description = sub.at("description");
-					usr->subreddit->display_name = sub.at("display_name");
-					usr->subreddit->display_name_prefixed = sub.at("display_name_prefixed");
-					nlohmann::json h_i = sub.at("header_img");
+					usr->subreddit->description = get_string_value(sub.at("description"));
+					usr->subreddit->display_name = get_string_value(sub.at("display_name"));
+					usr->subreddit->display_name_prefixed = get_string_value(sub.at("display_name_prefixed"));
+					nlohmann::json h_i = get_string_value(sub.at("header_img"));
 					if( !h_i.is_null() ) {
-						usr->subreddit->header_img = sub.at("header_img");
+						usr->subreddit->header_img = get_string_value(sub.at("header_img"));
 					} else {
 						usr->subreddit->header_img = "";
 					}
@@ -369,7 +364,7 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					
 					dsh = sub.at("icon_img");
 					if( !dsh.is_null() ) {
-						usr->subreddit->icon_img = sub.at("icon_img");
+						usr->subreddit->icon_img = get_string_value(sub.at("icon_img"));
 					} else {
 						usr->subreddit->icon_img = "";
 					}
@@ -383,29 +378,29 @@ Status get_self(AccessData* dat, UserAccount* usr){
 						usr->subreddit->icon_size.push_back(h_i[1]);
 					}
 					
-					usr->subreddit->is_default_banner = sub.at("is_default_banner");
-					usr->subreddit->is_default_icon = sub.at("is_default_icon");
-					usr->subreddit->key_color = sub.at("key_color");
-					usr->subreddit->link_flair_enabled = sub.at("link_flair_enabled");
-					usr->subreddit->name = sub.at("name");
-					usr->subreddit->over_18 = sub.at("over_18");
-					usr->subreddit->public_description = sub.at("public_description");
-					usr->subreddit->show_media = sub.at("show_media");
-					usr->subreddit->subreddit_type = sub.at("subreddit_type");
-					usr->subreddit->subscribers = sub.at("subscribers");
-					usr->subreddit->title = sub.at("title");
-					usr->subreddit->user_is_banned = sub.at("user_is_banned");
-					usr->subreddit->user_is_contributor = sub.at("user_is_contributor");
-					usr->subreddit->user_is_moderator = sub.at("user_is_moderator");
-					usr->subreddit->user_is_muted = sub.at("user_is_muted");
-					usr->subreddit->user_is_subscriber = sub.at("user_is_subscriber");
+					usr->subreddit->is_default_banner = get_boolean_value(sub.at("is_default_banner"));
+					usr->subreddit->is_default_icon = get_boolean_value(sub.at("is_default_icon"));
+					usr->subreddit->key_color = get_string_value(sub.at("key_color"));
+					usr->subreddit->link_flair_enabled = get_boolean_value(sub.at("link_flair_enabled"));
+					usr->subreddit->name = get_string_value(sub.at("name"));
+					usr->subreddit->over_18 = get_boolean_value(sub.at("over_18"));
+					usr->subreddit->public_description = get_string_value(sub.at("public_description"));
+					usr->subreddit->show_media = get_boolean_value(sub.at("show_media"));
+					usr->subreddit->subreddit_type = get_string_value(sub.at("subreddit_type"));
+					usr->subreddit->subscribers = get_integer_value(sub.at("subscribers"));
+					usr->subreddit->title = get_string_value(sub.at("title"));
+					usr->subreddit->user_is_banned = get_boolean_value(sub.at("user_is_banned"));
+					usr->subreddit->user_is_contributor = get_boolean_value(sub.at("user_is_contributor"));
+					usr->subreddit->user_is_moderator = get_boolean_value(sub.at("user_is_moderator"));
+					usr->subreddit->user_is_muted = get_boolean_value(sub.at("user_is_muted"));
+					usr->subreddit->user_is_subscriber = get_boolean_value(sub.at("user_is_subscriber"));
 					
 					
 					nlohmann::json sus = js.at("suspension_expiration_utc");
 					if( sus.is_null() ) {
 						usr->suspension_expiration_utc = 0;
 					} else {
-						usr->suspension_expiration_utc = js.at("suspension_expiration_utc");
+						usr->suspension_expiration_utc = get_long_value(js.at("suspension_expiration_utc"));
 					}
 					
 					usr->verified = js.at("verified");
@@ -413,18 +408,18 @@ Status get_self(AccessData* dat, UserAccount* usr){
 					
 				} catch( nlohmann::json::out_of_range& e ) {
 					try {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						
-						std::string message = js.at("message");
+						std::string message = get_string_value(js.at("message"));
 						
 						api_error(st, status_code, message);
 						
 						return st;
 					} catch ( nlohmann::json::out_of_range& e ) {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << e.what() << std::endl;
 						#endif
 						
@@ -482,7 +477,7 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv ){
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &jsondata );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -501,7 +496,7 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv ){
 				return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << jsondata << std::endl;
 				#endif
 				
@@ -518,12 +513,12 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv ){
 						
 						for( auto& elem : data_arr )
 						{
-							int comment_karma = elem.at("comment_karma");
-							int link_karma = elem.at("link_karma");
-							std::string subreddit = elem.at("sr");
+							int comment_karma = get_integer_value(elem.at("comment_karma"));
+							int link_karma = get_integer_value(elem.at("link_karma"));
+							std::string subreddit = get_string_value(elem.at("sr"));
 							
 							//SubredditKarma* sbkarma = new SubredditKarma;
-							struct sbkarma* sbkarma_ = new (std::nothrow) struct sbkarma;
+							struct sbkarma* sbkarma_ = new struct sbkarma;
 							if(!sbkarma_)
 							{
 								bad_alloc_error(s);
@@ -542,21 +537,21 @@ Status get_karma( AccessData* dat, std::vector<SubredditKarma*> *sbv ){
 				} catch ( nlohmann::json::out_of_range& e ) { 
 					try {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
 						std::string message;
 						int error;
 							
-						message = j.at("message");
-						error = j.at("error");
+						message = get_string_value(j.at("message"));
+						error = get_integer_value(j.at("error"));
 							
 						api_error(s, error, message);
 							
 						return s;
 					} catch ( nlohmann::json::out_of_range& e ) {
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						unknown_error(s);
@@ -627,7 +622,7 @@ Status get_blocked_users(AccessData* dat){
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &jsondat );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -643,7 +638,7 @@ Status get_blocked_users(AccessData* dat){
 				set_curl_strerror(s, result);
 				return s;
 			} else {
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << jsondat << std::endl;
 				#endif
 				
@@ -719,7 +714,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &jsondat );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -737,7 +732,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 				
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << jsondat << std::endl;
 				#endif
 				
@@ -746,7 +741,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 				out << jsondat;
 				#endif
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << jsondat.size() << std::endl;
 				#endif
 				
@@ -768,7 +763,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 					{
 						for( auto& elem : children )
 						{
-							auto k = nlohmann::json::parse( std::string(elem.dump()) );
+							auto k = nlohmann::json::parse( std::string(elem.dump()).c_str() );
 							BasicUser* fr = new (std::nothrow) BasicUser;
 							if(!fr) {
 								bad_alloc_error(s);
@@ -797,7 +792,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
@@ -807,7 +802,7 @@ Status get_friends(AccessData* dat, std::vector< BasicUser* >* f){
 						return s;
 					} catch( nlohmann::json::out_of_range& e ){
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
@@ -861,7 +856,7 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -885,7 +880,7 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 				//s.cstat = ERROR_NONE;
 				//s.message = "test";
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -911,14 +906,14 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 								auto tdata = elem.at("data");
 								std::string award_id;
 								try {
-									award_id = tdata.at("award_id");
+									award_id = tdata.at("award_id").get<std::string>();
 								} catch ( nlohmann::json::type_error& e ) {
 									award_id = "";
 								}
 								
 								std::string description;
 								try {
-									description = tdata.at("description");
+									description = tdata.at("description").get<std::string>();
 								} catch ( nlohmann::json::type_error& e ) {
 									description = "";
 								}
@@ -929,14 +924,14 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 								
 								std::string url;
 								try {
-									url = tdata.at("url");
+									url = tdata.at("url").get<std::string>();
 								} catch( nlohmann::json::type_error& e ) {
 									url = "";
 								}
 								
 								std::string id;
 								try {
-									id = tdata.at("id");
+									id = tdata.at("id").get<std::string>();
 								} catch ( nlohmann::json::type_error& e ) {
 									id = "";
 								}
@@ -967,7 +962,7 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						std::string msg = j.at("message");
@@ -977,7 +972,7 @@ Status get_trophies( AccessData* dat, std::vector< Trophy *> *vt ) {
 						return s;
 					} catch( nlohmann::json::out_of_range& e ) {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
@@ -1028,7 +1023,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			print("performing")
@@ -1046,7 +1041,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				return s;
 			} else if( result == CURLE_OK ) {
 				print("after performance")
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				std::cout << state << std::endl;
 				#endif
@@ -1080,7 +1075,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					std::string default_comment_sort = j.at("default_comment_sort");
 					std::string default_theme_sr;
 					try {
-						default_theme_sr = j.at("default_theme_sr");
+						default_theme_sr = get_string_value(j.at("default_theme_sr"));
 					} catch ( nlohmann::json::type_error& e ) {
 						default_theme_sr = "";
 					}
@@ -1127,7 +1122,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					bool show_gold_expiration = j.at("show_gold_expiration");
 					std::string show_promote;
 					try {
-						show_promote = j.at("show_promote");
+						show_promote = get_boolean_value(j.at("show_promote"));
 					} catch( nlohmann::json::type_error& e ) {
 						show_promote = "";
 					}
@@ -1221,14 +1216,14 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 				} catch ( nlohmann::json::out_of_range& e ) {
 					try {
 					
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
 						std::string message = j.at("message");
 						int error = j.at("error");
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << message << std::endl; 
 						#endif
 						
@@ -1236,7 +1231,7 @@ Status get_prefs( AccessData* dat, UserPrefs* up ) {
 					} catch( nlohmann::json::out_of_range& e ) {
 						
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
@@ -1266,13 +1261,13 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 	handle = curl_easy_init();
 	
 	if( handle ) {
-		CURLcode result = curl_global_init(CURL_GLOBAL_SSL);
-		if( result != CURLE_OK ) {
+		CURLcode gl_result = curl_global_init(CURL_GLOBAL_SSL);
+		if( gl_result != CURLE_OK ) {
 			
 			set_curl_global_error(s);
 			return s;
 		} else {
-			struct curl_slist* header;
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
 			authhead += " ";
@@ -1286,7 +1281,7 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -1304,7 +1299,7 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 				return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 			
@@ -1348,14 +1343,14 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 				} catch (nlohmann::json::out_of_range& e){
 					try {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
 						std::string message = j.at("message");
 						int error = j.at("error");
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << message << std::endl;
 						#endif
 						
@@ -1363,7 +1358,7 @@ Status get_blocked_prefs( AccessData* dat, std::vector< BasicUser* > *buv ) {
 						return s;
 					} catch ( nlohmann::json::out_of_range& e ) {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
@@ -1401,7 +1396,7 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 			return s;
 		} else if( global_result == CURLE_OK ){
 			
-			struct curl_slist* header;
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
 			authhead += " ";
@@ -1415,7 +1410,7 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -1433,7 +1428,7 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 				return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cerr << json << std::endl;
 				#endif
 				
@@ -1473,13 +1468,13 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 				} catch ( nlohmann::json::out_of_range& e) {
 					try {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
 						std::string message = j.at("message");
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cerr << message << std::endl;
 						#endif
 						
@@ -1491,7 +1486,7 @@ Status get_trusted( AccessData* dat, std::vector< BasicUser* > *tuv ) {
 						
 					} catch ( nlohmann::json::out_of_range& e ) {
 						
-						#ifdef DEBUG
+						#ifdef DEBUG || _DEBUG
 						std::cout << e.what() << std::endl;
 						#endif
 						
@@ -1520,12 +1515,12 @@ Status get_messagingprefs( AccessData* dat ) {
 	handle = curl_easy_init();
 	
 	if( handle ) {
-		CURLcode result = curl_global_init(CURL_GLOBAL_SSL);
-		if( result != CURLE_OK ) {
+		CURLcode gl_result = curl_global_init(CURL_GLOBAL_SSL);
+		if( gl_result != CURLE_OK ) {
 			set_curl_global_error(s);
 			return s;
 		} else {
-			struct curl_slist* header;
+			struct curl_slist* header = nullptr;
 			std::string authhead = "Authorization: ";
 			authhead += std::string(dat->token_type);
 			authhead += " ";
@@ -1539,7 +1534,7 @@ Status get_messagingprefs( AccessData* dat ) {
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -1557,7 +1552,7 @@ Status get_messagingprefs( AccessData* dat ) {
 				return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -1646,7 +1641,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				default: gv = "GLOBAL"; break;
 			}
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			std::cout << "Region: " << gv << std::endl;
 			#endif
 			
@@ -1714,7 +1709,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -1730,7 +1725,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 				return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -1751,7 +1746,7 @@ Status patch_prefs( AccessData* dat, UserPrefs* up ) {
 					api_error(s, error, message);
 					return s;
 				} catch ( nlohmann::json::out_of_range& e ) {
-					#ifdef DEBUG
+					#ifdef DEBUG || _DEBUG
 					std::cout << e.what() << std::endl;
 					#endif
 					unknown_error(s);

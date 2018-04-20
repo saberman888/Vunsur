@@ -54,7 +54,7 @@ Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType 
 			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, pd.dump() );
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -75,7 +75,7 @@ Status clear_flair_templates( AccessData* dat, std::string subreddit, FlairType 
 			} else {
 				if( json.size() == 0 )
 					json = "";
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -140,7 +140,7 @@ Status delete_flair( AccessData* dat, std::string subreddit, std::string flair_t
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -171,7 +171,7 @@ Status delete_flair( AccessData* dat, std::string subreddit, std::string flair_t
 					return s;
 				} catch( nlohmann::json::out_of_range& e )
 				{
-					#ifdef DEBUG
+					#ifdef DEBUG || _DEBUG
 					std::cerr << e.what() << std::endl;
 					#endif
 					

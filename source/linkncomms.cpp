@@ -44,7 +44,7 @@ Status get_trending( AccessData* acd )
 				set_curl_strerror(s,result); return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -121,7 +121,7 @@ Status get_id_by_name( AccessData* dat, std::vector< std::string > names )
 				set_curl_strerror(s,result); return s;
 			} else {
 				
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -200,7 +200,7 @@ Status comment( AccessData* dat, std::string parent, std::string text )
 				set_curl_strerror(s, result);
 				return s;
 			} else {
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG
 				std::cout << json << std::endl;
 				#endif
 				
@@ -260,7 +260,7 @@ Status delete_comment( AccessData* dat, std::string fullname )
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			

@@ -33,7 +33,7 @@ Status aboutUser( AccessData* acd, std::string username, UserAccount* ua )
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &jsondata );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -48,7 +48,7 @@ Status aboutUser( AccessData* acd, std::string username, UserAccount* ua )
 				set_curl_strerror(s, result);
 				return s;
 			} else {
-				#ifdef DEBUG
+				#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
 				std::cout << jsondata << std::endl;
 				#endif
 				
@@ -107,7 +107,7 @@ Status get_user_trophies(AccessData* acd, std::string username) {
 			curl_easy_setopt( handle, CURLOPT_SSL_VERIFYPEER, 0L );
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -180,7 +180,7 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 			curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, &writedat );
 			curl_easy_setopt( handle, CURLOPT_WRITEDATA, &json );
 			
-			#ifdef DEBUG
+			#ifdef DEBUG || _DEBUG
 			curl_easy_setopt( handle, CURLOPT_VERBOSE, 1L );
 			#endif
 			
@@ -209,7 +209,7 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 					root = saveddata.at("data");
 				} catch( nlohmann::json::out_of_range& e ) {
 					// if the root tag, "data" isn't present then check if there's an error message
-#ifdef DEBUG
+#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
 					std::cout << e.what() << std::endl;
 #endif
 
@@ -224,12 +224,11 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 				std::cout << "Before: " << before << std::endl;
 				std::cout << "After: " << after << std::endl;
 				
-				nlohmann::json data = root.at("data");
 				
 				nlohmann::json children;
 				
 				try {
-					children = data.at("children");
+					children = root.at("children");
 					if( children.is_array() && children.size() != 0) {
 					
 						for( auto& elem : children ) {
@@ -247,7 +246,7 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 								
 								
 							if( b->kind == Comment ) {
-								b->object.c.convert_json_to_comment(elem);
+								b->object.c.read(elem);
 								usl->children.push_back(b);
 							} else if( b->kind == Link ) {
 								// TODO
@@ -256,7 +255,7 @@ Status get_about_saved( AccessData* dat, std::string username, Listing<Blend*> *
 					}
 					
 				} catch( nlohmann::json::out_of_range& e ) {
-					#ifdef DEBUG
+					#ifdef DEBUG || _DEBUG || _DEBUG || _DEBUG
 					std::cerr << e.what() << std::endl;
 					#endif
 					

@@ -3,7 +3,7 @@
 
 void set_curl_handle_error( Status& s )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: Failed to initialize CURL *handle " << std::endl;
 	#endif
 	
@@ -15,7 +15,7 @@ void set_curl_handle_error( Status& s )
 
 void set_curl_global_error( Status& s )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: Failed to initialize CURL GLOBAL " << std::endl;
 	#endif
 	
@@ -26,7 +26,7 @@ void set_curl_global_error( Status& s )
 
 void set_curl_strerror( Status& s, CURLcode result )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << curl_easy_strerror(result) << std::endl;
 	#endif
 	
@@ -36,7 +36,7 @@ void set_curl_strerror( Status& s, CURLcode result )
 
 void api_error(Status& s, int code, std::string message)
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << message << std::endl;
 	#endif
 	
@@ -47,7 +47,7 @@ void api_error(Status& s, int code, std::string message)
 
 void array_error( Status& s )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: Failed to parse json children " << std::endl;
 	#endif
 	
@@ -57,7 +57,7 @@ void array_error( Status& s )
 
 void not_an_array_error( Status& s, std::string array_name )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: " << array_name << " is not an array " << std::endl;
 	#endif
 	
@@ -71,7 +71,7 @@ void not_an_array_error( Status& s, std::string array_name )
 
 void unknown_error( Status& s )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: Unknown error " << std::endl;
 	#endif
 	
@@ -81,7 +81,7 @@ void unknown_error( Status& s )
 
 void bad_alloc_error( Status& s )
 {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: Bad allocation! " << std::endl;
 	#endif
 	
@@ -91,7 +91,7 @@ void bad_alloc_error( Status& s )
 
 void not_logged_in( Status& s ) {
 	
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: Not logged in" << std::endl;
 	#endif
 	s.code = NULL;
@@ -100,7 +100,7 @@ void not_logged_in( Status& s ) {
 }
 
 void no_modhash(Status& s) {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << "Error: No modhash available" << std::endl;
 	#endif
 	
@@ -110,7 +110,7 @@ void no_modhash(Status& s) {
 }
 
 void json_error(Status& s, std::string message) {
-	#ifdef DEBUG
+	#ifdef DEBUG || _DEBUG
 	std::cerr << message << std::endl;
 	#endif
 	s.cstat = ERROR_JSONERROR;
