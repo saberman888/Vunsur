@@ -3,13 +3,13 @@ STATIC_LIB := ar rcs
 INC := -IC:/MinGW/include -LC:/MinGW/lib -I ./include/Vunsur -I .
 INC_EXAMPLE := -I ./include/Vunsur -L ./lib
 DEBUG_MACROS := -DDEBUG=1 -DOUTJSON=1
-FLAGS := -w -Wall -Wextra -march=native -Wfatal-errors
+FLAGS := -w -Wall -Wextra -march=native
 
 BIN := lib/libvunsur.a
 BIN_DEBUG := lib/libvunsur_debug.a
-OBJS := oauth.o Error.o Flair.o Info.o Script.o Types.o UserAccount.o account.o condition.o gold.o linkncomms.o other.o selfaccount.o subreddit.o user.o Comment.o
+OBJS := oauth.o Error.o Flair.o Info.o Script.o Types.o UserAccount.o account.o condition.o gold.o linkncomms.o other.o selfaccount.o subreddit.o user.o VunComment.o vujson.o
 
-SRC := source/Error.cpp source/Flair.cpp source/Info.cpp source/Script.cpp source/Types.cpp source/UserAccount.cpp source/account.cpp source/condition.cpp source/gold.cpp source/linkncomms.cpp source/other.cpp source/selfaccount.cpp source/subreddit.cpp source/subreddit.cpp source/user.cpp source/oauth.cpp source/Comment.cpp
+SRC := source/Error.cpp source/Flair.cpp source/Info.cpp source/Script.cpp source/Types.cpp source/UserAccount.cpp source/account.cpp source/condition.cpp source/gold.cpp source/linkncomms.cpp source/other.cpp source/selfaccount.cpp source/subreddit.cpp source/subreddit.cpp source/user.cpp source/oauth.cpp source/VunComment.cpp source/vujson.cpp
 SRC_EXAMPLE := ./example/example.cpp
 
 LINK_LIB := -lcurl -lcurldll
@@ -28,8 +28,8 @@ all:
 	$(GCC) $(INC) $(INC_EXAMPLE) $(FLAGS) -c examples\example.cpp $(LINK_LIB) -lvunsur
 	$(GCC) $(INC) $(INC_EXAMPLE) -o examples\Example example.o -lvunsur $(LINK_LIB)
 	
-	$(GCC) $(INC) $(INC_EXAMPLE) $(FLAGS) -c examples\example.cpp $(LINK_LIB) -lvunsur_debug
-	$(GCC) $(INC) $(INC_EXAMPLE) -o examples\Example_debug example.o -lvunsur_debug $(LINK_LIB)
+	$(GCC) $(INC) $(INC_EXAMPLE) $(FLAGS) $(DEBUG_MACROS) -c examples\example.cpp $(LINK_LIB) -lvunsur_debug
+	$(GCC) $(INC) $(INC_EXAMPLE) $(DEBUG_MACROS) -o examples\Example_debug example.o -lvunsur_debug $(LINK_LIB)
 	
 	del *.o
 
