@@ -392,7 +392,6 @@ Status ScriptAccess::authenticate()
 			
 			if( result != CURLE_OK )
 			{
-				println("CURL NOT OK");
 				// Get response code
 				curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status_code);
 				// If handle's operation failed then print out the curl error message
@@ -407,7 +406,6 @@ Status ScriptAccess::authenticate()
 				return s;
 				
 			} else {
-				println("CURL OK");
 				// Get response code 
 				curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status_code);
 				// If everything succeeds then proceed to extract the json
