@@ -349,7 +349,7 @@ Status ScriptAccess::authenticate()
 			curl_easy_setopt( handle, CURLOPT_URL, "https://www.reddit.com/api/v1/access_token" );
 			curl_easy_setopt( handle, CURLOPT_POST, 1L );
 			
-			println(0);
+
 			// These params will hold the username, password and permissions
 			std::string params = this->bind_params();
 			
@@ -362,12 +362,12 @@ Status ScriptAccess::authenticate()
 		
 			// then set the params into the POST request
 			curl_easy_setopt( handle, CURLOPT_POSTFIELDS, params.c_str() );
-			println(1);
+
 			
 			std::cout << userpwd << std::endl;
 			curl_easy_setopt( handle, CURLOPT_USERPWD, userpwd.c_str() );
 			
-			println(2);
+
 			// Set the userAgent
 			curl_easy_setopt( handle, CURLOPT_USERAGENT, this->user_agent.c_str() );
 			// Set SSL_VERIFYPEER to 0L
@@ -416,7 +416,7 @@ Status ScriptAccess::authenticate()
 				#ifdef DEBUG || _DEBUG
 				std::cout << returndata << std::endl;
 				#endif
-				println(returndata.size());
+
 				// Parse the json
 				nlohmann::json j = nlohmann::json::parse(returndata);
 				// declare the necessary variables
@@ -425,20 +425,18 @@ Status ScriptAccess::authenticate()
 				std::string type;
 				int expires_in;
 				// and then attempt to extract the needed data
-				println("json");
 				try{
-					print("assigned");
-					acctoken = j.at("access_token");
-					scope = j.at("scope");
-					type = j.at("token_type");
-					expires_in = j.at("expires_in");
+					acctoken = get_string_value(j.at("access_token"));
+					scope = get_string_value(j.at("scope"));
+					type = get_string_value(j.at("token_type"));
+					expires_in = get_integer_value(j.at("expires_in"));
 						
 				} catch( nlohmann::json::out_of_range& e ) {
 					try {
 						println("error 1");
 						// If extracting the values fails then try to extract error values
-						std::string error_msg = j.at("message");
-						int code = j.at("error");
+						std::string error_msg = get_string_value(j.at("message"));
+						int code = get_integer_value(j.at("error"));
 						// print error message if DEBUG || _DEBUG is defined
 						#ifdef DEBUG || _DEBUG
 						std::cerr << "Error: " << error_msg << ", code: " << code << std::endl;
@@ -454,7 +452,7 @@ Status ScriptAccess::authenticate()
 							println("error 2");
 							// If obtaining the error fails then maybe
 							// the error is an unsupported_grant_type
-							std::string error = j.at("error");
+							std::string error = get_string_value(j.at("error"));
 							s.code = static_cast<int>(status_code);
 							s.cstat = ERROR_NONE;
 							s.message = error;
@@ -477,7 +475,6 @@ Status ScriptAccess::authenticate()
 							return s;
 						} catch( nlohmann::json::out_of_range& e )
 						{
-							println("error 3");
 							// If everything fails then return an Unknown error
 							unknown_error(s);
 							
@@ -486,7 +483,6 @@ Status ScriptAccess::authenticate()
 					}
 				}
 				
-				println("continue")
 				// Allocate acd so we can store our token information
 				this->acd = new AccessData;
 				if( !this->acd )
@@ -502,14 +498,12 @@ Status ScriptAccess::authenticate()
 				this->acd->userAgent = user_agent;
 				
 				
-				println("c1");
 				// Convert the expired time to time now
 				/*time_t t = time(0);
 				struct tm * now = localtime(&t);*/
 				// Since most expire times are 3600, which is 1 hour
 				// add 1 to the hour variable to the now struct.
 				// There might be more times, but as for now I don't know
-				println("c2");
 				/*if(expires_in == 3600)
 					now->tm_hour += 1;*/
 				
@@ -520,7 +514,6 @@ Status ScriptAccess::authenticate()
 				s.cstat = ERROR_NONE;
 				s.message = "";
 				// and reeeeeeeeeeeeturn!
-				println("done");
 				return s;
 			}
 		} else {
