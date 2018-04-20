@@ -9,6 +9,7 @@
 #include "Info.hpp"
 #include "other.hpp"
 #include "oauth.hpp"
+#include "vujson.hpp"
 
 /* account includes */
 #include "account/selfaccount.hpp"
@@ -24,7 +25,7 @@
 /* basic compiler includes */
 #include <string>
 #include "curl/curl.h"
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 #include <ctime>
 
 #define println(x) std::cout << x << std::endl;
@@ -33,8 +34,8 @@ class ScriptAccess : private OAUTH{
 	public:
 
 		// The constructor
+		// It accepts client_id,secret,username,password and useragent in either in it's form or NULL
 		ScriptAccess(  const char* client_id, const char* secret, const char* username, const char* password, const char* userAgent  ); 
-		ScriptAccess(); // An empty constructor for those not using client_ids, secrets and usernames/passwords
 		~ScriptAccess(); // The deconstructor
 		// This function authorized with reddit with the "main data"
 		// and returns data to access the ret of the API
@@ -84,7 +85,7 @@ class ScriptAccess : private OAUTH{
 		Status getSubredditSetting( std::string subreddit );
 		
 		//********** USER FUNCTIONS ***************/
-		Status getUserSaved( std::string username ); // Does not work for now
+		Status getUserSaved( std::string username, Listing<Blend*> *usl ); // Does not work for now
 		
 		
 		/************* LISTING FUNCTIONS **********/
