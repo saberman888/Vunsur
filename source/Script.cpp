@@ -547,3 +547,8 @@ Status ScriptAccess::authenticate()
 	}
 	
 }
+
+ScriptAccess & operator<<(ScriptAccess & sc, const Permission p)
+{
+	sc.permissions.push_back(p); return sc;
+}
