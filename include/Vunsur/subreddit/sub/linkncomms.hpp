@@ -2,7 +2,7 @@
 #define LINK_AND_COMMENTS_HPP
 
 #include "curl/curl.h"
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 #include <iosfwd>
 
 #include "subreddit/sub/Post.hpp"

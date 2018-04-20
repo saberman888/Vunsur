@@ -1,7 +1,7 @@
 #ifndef SUBREDDIT_HPP
 #define SUBREDDIT_HPP
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 #include "curl/curl.h"
 #include <iosfwd>
 #include <string>
