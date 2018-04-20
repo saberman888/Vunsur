@@ -307,7 +307,7 @@ Status ScriptAccess::getUserSaved(std::string username, Listing<Blend*>* usl, in
 		
 		not_logged_in(m);
 	}
-	return m
+	return m;
 }
 
 Status ScriptAccess::deleteComment(std::string fullname)
