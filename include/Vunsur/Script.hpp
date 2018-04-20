@@ -102,7 +102,6 @@ class ScriptAccess : private OAUTH{
 		
 		
 		/* OAUTH stuff */
-		void operator<<(const Permission &p) { this->permissions.push_back(p); }
 		void add(Permission p) { this->permissions.push_back(p); }
 		
 		
@@ -114,6 +113,7 @@ class ScriptAccess : private OAUTH{
 		struct tm* ExpireTime() { return this->acd->expire; }
 		
 	private:
+		friend ScriptAccess& operator<<(ScriptAccess& sc, const Permission p);
 		Status authenticate();
 		AccessData *acd;
 		// A UserAccount instance for the logged in user
@@ -125,9 +125,5 @@ class ScriptAccess : private OAUTH{
 
 };
 
-// From Info.cpp, this writes buffer data into src - a string
-//size_t writedat(char* buffer, size_t size, size_t nmemb, std::string& src);
-// Declaration for the function to get a access token from Reddit
-//Status authenticate( ScriptAccess* src, AccessData* acs ); -- deprecated
-
+ScriptAccess& operator<<(ScriptAccess& sc, const Permission p);
 #endif
