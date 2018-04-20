@@ -1,8 +1,8 @@
 #ifndef BLEND_HPP
 #define BLEND_HPP
 
-#include "Post.hpp"
-#include "Comment.hpp"
+#include "subreddit/sub/Post.hpp"
+#include "subreddit/comments/VunComment.hpp"
 
 #include "base/Types.hpp"
 
@@ -10,14 +10,15 @@
 	The blend structure is suppose to hold either a Post type or a 
 	Comment type. It is used in lists/Listings that have both posts and comments ( e.g saved )
 */
-union BlendObject {
-	Post* p;
-	VunComment* c;
-};
 
-struct Blend {
-	VunType kind;
-	union BlendObject object;
-};
+typedef struct _BlendObject {
+	VunComment c;
+	Post p;
+}BlendObject;
+
+typedef struct _Blend {
+		VunType kind;
+		BlendObject object;
+}Blend;
 
 #endif
