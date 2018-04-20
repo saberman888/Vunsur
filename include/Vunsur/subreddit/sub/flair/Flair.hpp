@@ -1,8 +1,8 @@
 #ifndef FLAIR_FUNCTIONS_HPP
 #define FLAIR_FUNCTIONS_HPP
 
-#include <curl/curl.h>
-#include "json.hpp"
+#include "curl/curl.h"
+#include "nlohmann/json.hpp"
 #include <string>
 #include <iosfwd>
 
