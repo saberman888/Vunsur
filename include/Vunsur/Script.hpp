@@ -85,8 +85,8 @@ class ScriptAccess : private OAUTH{
 		Status getSubredditSetting( std::string subreddit );
 		
 		//********** USER FUNCTIONS ***************/
-		Status getUserSaved( std::string username, Listing<Blend*> *usl ); // Does not work for now
-		
+		Status getUserSaved( std::string username, Listing<Blend*> *usl );
+		Status getUserSaved(std::string username, Listing<Blend*> *usl, int limit);
 		
 		/************* LISTING FUNCTIONS **********/
 		Status getTrending();
