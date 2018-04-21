@@ -12,6 +12,11 @@ VunComment::VunComment()
 
 }
 
+void VunComment::get_more_replies()
+{
+	// TODO
+}
+
 void VunComment::get_replies(nlohmann::json& src)
 {
 	if (!src.is_string() && src.is_array())
@@ -56,7 +61,8 @@ void VunComment::read(nlohmann::json&  src)
 	nlohmann::json data = src.at("data");
 	
 	this->source.approved_at_utc = get_long_value( data.at("approved_at_utc") );
-	//this->source.approved = get_boolean_value( data.at("approved") );
+	if( does_value_exist(data, "approved"))
+		this->source.approved = get_boolean_value( data.at("approved") );
 	this->source.approved_by = get_string_value( data.at("approved_by") );
 	this->source.archived =  get_boolean_value( data.at("archived") );
 	this->source.author = get_string_value( data.at("author") );
@@ -99,7 +105,8 @@ void VunComment::read(nlohmann::json&  src)
 	this->source.num_comments = get_integer_value( data.at("num_comments") );
 	this->source.num_reports = get_integer_value( data.at("num_reports") );
 	this->source.parent_id = get_string_value( data.at("parent_id") );
-	this->source.over18 = get_boolean_value( data.at("over18") );
+	if( does_value_exist(data, "over18"))
+		this->source.over18 = get_boolean_value( data.at("over18") );
 	this->source.permalink = get_string_value( data.at("permalink") );
 	this->source.quarantine = get_boolean_value( data.at("quarantine") );
 	this->source.removal_reason = get_string_value( data.at("removal_reason") );
