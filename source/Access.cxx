@@ -76,7 +76,6 @@ namespace Vunsur {
   		#endif
   		restart_minute_clock();
   	} else if (mnow >= mthen) {
-  		std::clog << "Restarting the minute clock!" << std::endl;
   		restart_minute_clock();
     }
   }
@@ -91,7 +90,7 @@ namespace Vunsur {
   void Access:tick()
   {
     requests_done += 1;
-  	if (now < then) {
+  	if (now <= then) {
   		this->request_done_in_current_minute += 1;
   	}
   }
