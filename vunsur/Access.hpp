@@ -4,6 +4,7 @@
 #include <string>
 #include <chrono>
 #include <ctime>
+#include <thread>
 
 namespace Vunsur {
   typedef enum e_permissions
@@ -63,7 +64,12 @@ namespace Vunsur {
       void is_mtime_up();
       bool is_time_up();
       void tick();
-
+      
+      void operator<<(const Access& a, const Permission p);
 
   };
+
+  bool init();
+  bool init(CURLcode& result);
+  void cleanup();
 }
