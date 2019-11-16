@@ -2,7 +2,7 @@
 
 namespace Vunsur {
 
-  Access::Access() : requests_done_in_60(0) total_requests_in_session(0), scope("scope=")
+  Access::Access() : requests_done_in_60(0), total_requests_in_session(0), scope("scope=")
   {
     this->permission_string_list = {
       "account",
@@ -41,7 +41,7 @@ namespace Vunsur {
     // If it the perms is 0, then grant all permissions
     if(perms.empty())
     {
-      for(std::string : permission_string_list)
+      for(std::string elem : permission_string_list)
       {
         scope += elem;
         scope += "%20";
@@ -55,6 +55,11 @@ namespace Vunsur {
     }
   }
 
+  void Access::set_rq_limit(int rq_per_60, int max_per_session)
+  {
+    rq_per_minute = rq_per_60;
+    max_rq_per_session = max_per_session;
+  }
   void Access::reset_minute_clock()
   {
     std::chrono::minutes one_minute(1);
@@ -74,36 +79,36 @@ namespace Vunsur {
   		#else
   		usleep(60);
   		#endif
-  		restart_minute_clock();
+  		reset_minute_clock();
   	} else if (mnow >= mthen) {
-  		restart_minute_clock();
+  		reset_minute_clock();
     }
   }
 
-  void Access::is_time_up()
+  bool Access::is_time_up()
   {
     if(now >= then)
       return true;
     return false;
   }
 
-  void Access:tick()
+  void Access::tick()
   {
-    requests_done += 1;
+    total_requests_in_session += 1;
   	if (now <= then) {
-  		this->request_done_in_current_minute += 1;
+  		requests_done_in_60 += 1;
   	}
   }
 
   bool init()
   {
-    CURLcode result = curl_global_init();
+    CURLcode result = curl_global_init(CURL_GLOBAL_ALL);
     return (result == CURLE_OK);
   }
 
   bool init(CURLcode& result)
   {
-    result = curl_global_init();
+    result = curl_global_init(CURL_GLOBAL_ALL);
     return (result == CURLE_OK);
   }
 
@@ -113,9 +118,10 @@ namespace Vunsur {
     curl_global_cleanup();
   }
 
-  void Access::operator<<(const Access& a, const Permission p)
+  Access& operator<<(Access& a, const Permission p)
   {
     a.perms.push_back(p);
+    return a;
   }
 
 }

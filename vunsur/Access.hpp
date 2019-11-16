@@ -4,7 +4,15 @@
 #include <string>
 #include <chrono>
 #include <ctime>
-#include <thread>
+#include <vector>
+
+#if defined(unix) || defined(_unix)
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#else
+#include <Synchapi.h>
+#endif
 
 namespace Vunsur {
   typedef enum e_permissions
@@ -41,19 +49,21 @@ namespace Vunsur {
 
   class Access
   {
-    private:
-      std::vector<std::string> permission_string_list;
-    protected:
+  public:
       std::string client_id, secret;
       std::string username, password;
       std::string user_agent;
       std::string scope;
 
+      std::vector<std::string> permission_string_list;
       void gen_permissions();
-    public:
+
+      int rq_per_minute, max_rq_per_session;
+      void set_rq_limit(int rq_per_60, int max_per_session);
+
       Access();
       std::string token, tokentype;
-      std::vector<Permissions> perms;
+      std::vector<Permission> perms;
 
       virtual void obtain_token();
 
@@ -64,10 +74,10 @@ namespace Vunsur {
       void is_mtime_up();
       bool is_time_up();
       void tick();
-      
-      void operator<<(const Access& a, const Permission p);
 
+      friend Access& operator<<(Access& a, const Permission p);
   };
+  Access& operator<<(Access& a, const Permission p);
 
   bool init();
   bool init(CURLcode& result);
